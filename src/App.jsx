@@ -1,19 +1,25 @@
 import { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
+import {jwtDecode} from "jwt-decode"; 
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import HomePage from "./components/HomePage";
+import Dashboard from "./pages/Dashboard";
 import AdminHome from "./components/AdminHome";
 import RentalHome from "./components/RentalHome";
 import UserHome from "./components/UserHome";
-import Login from "./components/Login";
-import Register from "./components/Register";
+import LoginPage from "./pages/LoginPage"
+import SignupPage from "./pages/SignupPage";
 
 function App() {
-  const [cookies] = useCookies(["jwtToken", "role"]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const decode=document.cookie?.split("=")[1]
+  let cookies=""
+  if(decode){
+  cookies=jwtDecode(decode)
+  console.log(cookies.role)
+  }
   useEffect(() => {
-    setIsAuthenticated(!!cookies.jwtToken);
+    if(cookies){
+    setIsAuthenticated(true);
+    }
   }, [cookies]);
 
   // Determine home route based on role
@@ -34,12 +40,12 @@ function App() {
     <Router>
       <Routes>
         {/* Redirect unauthenticated users to /login */}
-        <Route path="/" element={isAuthenticated ? <Navigate to={getHomeRoute()} /> : <Navigate to="/login" />} />
+        <Route path="/" element={isAuthenticated ? <Navigate to={getHomeRoute()} /> : <Dashboard />} />
         <Route path="/admin-home" element={isAuthenticated && cookies.role === "admin" ? <AdminHome /> : <Navigate to="/login" />} />
         <Route path="/rental-home" element={isAuthenticated && cookies.role === "rental" ? <RentalHome /> : <Navigate to="/login" />} />
         <Route path="/user-home" element={isAuthenticated && cookies.role === "user" ? <UserHome /> : <Navigate to="/login" />} />
-        <Route path="/login" element={isAuthenticated ? <Navigate to={getHomeRoute()} /> : <Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={isAuthenticated ? <Navigate to={getHomeRoute()} /> : <LoginPage />} />
+        <Route path="/register" element={<SignupPage />} />
       </Routes>
     </Router>
   );
