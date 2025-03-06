@@ -1,9 +1,11 @@
 import axios from "axios"
-import { useNavigate } from "react-router-dom"
 import {useRef, useState} from "react"
-
+import { useCookies } from "react-cookie";
+import { jwtDecode } from "jwt-decode";
 export default function AddCategory(){
-    const navigate=useNavigate();
+    const [cookies]=useCookies(['jwtToken']);
+    const userId=jwtDecode(cookies.jwtToken).user_id;
+    console.log(userId);
     const categoryName=useRef('');
     const categoryDescription=useRef('');
     const [showErrorMsg,setShowErrorMsg]=useState(false);
@@ -16,6 +18,7 @@ export default function AddCategory(){
         console.log(categoryName.current.value+" "+categoryDescription.current.value)
         try{
             const response=await axios.post("http://localhost:8080/renter/addCategory",{
+                user:userId,
                 categoryName:categoryName.current.value,
                 categoryDescription:categoryDescription.current.value
             },{withCredentials:true})
