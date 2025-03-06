@@ -9,12 +9,11 @@
   box-sizing: border-box;
   font-family: "Montserrat", sans-serif;
 }
-body {
+/* body {
   background: #5F41E4;
-}
+} */
 #root {
   width: 100%;
-  padding: 0.6rem;
 }
 .login-container {
   margin: 0 auto;
@@ -24,6 +23,17 @@ body {
   background: #fff;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
+
+.add-category-container {
+  margin: 0 auto;
+  max-width: 410px;
+  padding: 2rem 1.5rem;
+  border-radius: 0.5rem;
+  background: #fff;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  height:fit-content;
+}
+
 .login-container .form-title {
   text-align: center;
   font-size: 1.37rem;
@@ -174,3 +184,4 @@ body {
   margin-top: 0.25rem;
   display: block;
 }
+

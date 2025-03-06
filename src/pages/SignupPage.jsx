@@ -8,7 +8,7 @@ function SignupPage() {
     username: '',
     email: '',
     password: '',
-    phone: '',
+    phoneNumber: '',
     address: '',
     role:''
   });
@@ -44,12 +44,12 @@ function SignupPage() {
     }
 
     // Phone Number Validation
-    if (!formData.phone) {
-      errors.phone = 'Phone number is required.';
+    if (!formData.phoneNumber) {
+      errors.phoneNumber = 'Phone number is required.';
     } else {
       const phonePattern = /^[0-9]{10}$/;
-      if (!phonePattern.test(formData.phone)) {
-        errors.phone = 'Enter a valid 10-digit phone number.';
+      if (!phonePattern.test(formData.phoneNumber)) {
+        errors.phoneNumber = 'Enter a valid 10-digit phoneNumber number.';
       }
     }
 
@@ -80,7 +80,7 @@ function SignupPage() {
       }
 
       // Reset form after successful submission
-      setFormData({ username: '', email: '', password: '', phone: '', address: '',role:'' });
+      setFormData({ username: '', email: '', password: '', phoneNumber: '', address: '',role:'' });
     }
 
   };
@@ -155,15 +155,15 @@ function SignupPage() {
             <i className="material-symbols-outlined">call</i>
             <input
               type="text"
-              id="phone"
-              name="phone"
-              placeholder="Enter your phone number"
+              id="phoneNumber"
+              name="phoneNumber"
+              placeholder="Enter your phoneNumber number"
               className="input-field"
-              value={formData.phone}
+              value={formData.phoneNumber}
               required
               onChange={handleChange}
             />
-            {errors.phone && <span className="error">{errors.phone}</span>}
+            {errors.phoneNumber && <span className="error">{errors.phoneNumber}</span>}
           </div>
         </div>
 
@@ -189,7 +189,7 @@ function SignupPage() {
                 <option value="rental">Rental</option>
                 <option value="user">User</option>
               </select> 
-              {errors.phone && <span className="error">{errors.role}</span>}
+              {errors.phoneNumber && <span className="error">{errors.role}</span>}
            </div>
         </div>       
 

@@ -13,6 +13,7 @@ export default function AddCategory(){
             setShowErrorMsg(true);
             return;
         }
+        console.log(categoryName.current.value+" "+categoryDescription.current.value)
         try{
             const response=await axios.post("http://localhost:8080/renter/addCategory",{
                 categoryName:categoryName.current.value,
@@ -25,8 +26,6 @@ export default function AddCategory(){
             categoryName.current.value="";
 
             alert("category added!")
-
-            navigate("/");
         }
         catch(err){
             console.log(err)
@@ -34,7 +33,8 @@ export default function AddCategory(){
     }
 
     return( 
-    <div className="login-container">
+        <>
+    <div className="add-category-container">
         <h3 style={{textAlign:"center"}}>Add a new Category</h3>
         <div className="mb-3">
         <input type="text" className="form-control" id="exampleFormControlInput1" placeholder="Enter category name" ref={categoryName}/>
@@ -45,5 +45,6 @@ export default function AddCategory(){
         {showErrorMsg && <p style={{color:"red"}}>Please enter Category Name!!</p>}
         <button className="btn btn-primary" onClick={handleSubmit}>Add Category</button>
     </div>
+    </>
     )
 }

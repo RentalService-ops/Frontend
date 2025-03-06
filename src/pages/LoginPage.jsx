@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/index.css'
 import SocialLogin from "../components/SocialLogin";
@@ -7,7 +7,7 @@ import axios from "axios"
 import { jwtDecode } from 'jwt-decode';
 
 
-const LoginPage = () => {
+const LoginPage = ({setIsAuthenticated}) => {
   const [cookies,setCookie]=useCookies(['jwtToken','role'])
   const getHomeRoute = (role) => {
     switch (role) {
@@ -63,6 +63,7 @@ const LoginPage = () => {
         let userRole=jwtDecode(response.data.token).role;
         console.log(userRole)
         setCookie('role',userRole, { path: "/", maxAge: 86400 })
+        setIsAuthenticated(true)
         if (userRole === "admin") navigate("/admin-home");
         else if (userRole === "rental") navigate("/rental-home");
         else navigate("/user-home"); // Default for 'user'
