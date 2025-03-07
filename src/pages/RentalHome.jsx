@@ -4,6 +4,7 @@ import NavBar from "../components/NavBar"
 import RentalDashboard from '../components/RentalDashboard';
 import AddCategory from '../components/AddCategory';
 import AddEquipment from '../components/AddEquipment'
+import Footer from "../components/Footer"
 const RentalHome = () => {
   const [activeLink,setActiveLink]=useState("Home");
   function returnComponent(){
@@ -24,6 +25,7 @@ const RentalHome = () => {
     <Sidebar setActiveLink={setActiveLink} activeLink={activeLink}/>
     {returnComponent()}
     </div>
+    <Footer />
     </div>
   );
 };

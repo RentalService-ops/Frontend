@@ -5,7 +5,6 @@ import { jwtDecode } from "jwt-decode";
 export default function AddCategory(){
     const [cookies]=useCookies(['jwtToken']);
     const userId=jwtDecode(cookies.jwtToken).user_id;
-    console.log(userId);
     const categoryName=useRef('');
     const categoryDescription=useRef('');
     const [showErrorMsg,setShowErrorMsg]=useState(false);
@@ -17,11 +16,16 @@ export default function AddCategory(){
         }
         console.log(categoryName.current.value+" "+categoryDescription.current.value)
         try{
-            const response=await axios.post("http://localhost:8080/renter/addCategory",{
+            const response=await axios.post("http://localhost:8080/api/rental/addCategory",{
                 user:userId,
-                categoryName:categoryName.current.value,
-                categoryDescription:categoryDescription.current.value
-            },{withCredentials:true})
+                name:categoryName.current.value,
+                description:categoryDescription.current.value
+            },{
+                headers: {
+                    Authorization: `Bearer ${cookies.jwtToken}`,
+                    "Content-Type":"multipart/form-data"
+                  }
+                ,withCredentials:true})
 
             console.log(response.data)
 
@@ -31,7 +35,7 @@ export default function AddCategory(){
             alert("category added!")
         }
         catch(err){
-            console.log(err)
+            console.log(err.stack)
         }
     }
 
