@@ -3,6 +3,7 @@ import { useCookies } from "react-cookie";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import Footer from "../layout/Footer";
 
 
 export default function UserDashboard(){
@@ -24,7 +25,7 @@ export default function UserDashboard(){
   
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 6;
+    const itemsPerPage = 4;
 
     useEffect(() => {
         async function fetchEquipmentData() {
@@ -112,7 +113,7 @@ export default function UserDashboard(){
             startDate,
             endDate,
             totalPrice: totalCost,
-            quantity,
+            equipment_quantity: quantity,
             status: "PENDING",
           };
     
@@ -140,23 +141,26 @@ export default function UserDashboard(){
         <>
         <Container className="py-5">
         <h2 className="text-center fw-bold text-dark mb-4">Available Equipment</h2>
-        <Row className="g-4 row-cols-1 row-cols-sm-2 row-cols-lg-3">
+        <Row className="d-flex flex-row justify-content-evenly flex-wrap">
           {currentItems.map((item) => (
-            <Col key={item.equipmentId}>
-              <Card className="shadow-sm border-0 h-100" onClick={() => handleShowDetails(item)}>
-                <Card.Img
-                  variant="top"
-                  src={imageUrls[item.imageUrl] || "/defaultImage.png"}
-                  alt="Equipment"
-                  style={{ height: "200px", objectFit: "cover" }}
-                />
-                <Card.Body>
+            <Col style={{width:"400px"}}>
+            <Card className="shadow-lg border-0 h-100 w-100" onClick={() => handleShowDetails(item)} key={item.equipmentId}>
+              <Card.Img
+                variant="top"
+                src={imageUrls[item.imageUrl] || "/defaultImage.png"}
+                alt="Equipment"
+                style={{ height: "250px", objectFit: "cover" }}
+              />
+              <Card.Body className="d-flex flex-column justify-content-between">
+                <div>
                   <Card.Title>{item.name}</Card.Title>
-                  <Card.Text>₹{item.pricePerDay} / Day</Card.Text>
-                  <Button variant="primary">View Details</Button>
-                </Card.Body>
-              </Card>
-            </Col>
+                  <Card.Text className="fw-bold">₹{item.pricePerDay} / Day</Card.Text>
+                </div>
+                <Button variant="primary" className="mt-auto">View Details</Button>
+              </Card.Body>
+            </Card>
+          </Col>
+          
           ))}
         </Row>
 
@@ -223,6 +227,7 @@ export default function UserDashboard(){
           </Modal.Footer>
         </Modal>
       )}
+      
         </>
     )
 }

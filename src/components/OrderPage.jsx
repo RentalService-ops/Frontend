@@ -31,6 +31,7 @@ const OrderPage = () => {
 
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.user_id;
+      console.log(userId)
 
       const response = await axios.get(
         `http://localhost:8080/api/bookings/bookingDetails/${userId}`,
@@ -41,6 +42,7 @@ const OrderPage = () => {
       );
 
       const bookings = response.data;
+      console.log(bookings)
       setOrders(bookings);
       fetchEquipmentDetails(bookings);
     } catch (error) {
@@ -61,8 +63,13 @@ const OrderPage = () => {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
-  
+      console.log("data");
+      console.log(response.data);
       if (!response.data || !Array.isArray(response.data)) {
+       
+
+        console.log(response.data);
+        
         console.error("Invalid equipment data:", response.data);
         return;
       }
@@ -131,6 +138,8 @@ const OrderPage = () => {
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+  console.log(currentOrders);
+  
 
   return (
     <div className="min-vh-100 d-flex flex-column">

@@ -1,16 +1,17 @@
 import {Card,Button } from "react-bootstrap";
-const OrderCard = ({ order, equipmentData, onConfirmCancel }) => {
+const OrderCard = ({ order, onConfirmCancel }) => {
     return (
       <Card className="mb-3 shadow-sm">
         <Card.Body>
           <Card.Title className="fw-bold text-primary">
-            {equipmentData[order.equipmentId]?.name || "Loading Equipment..."}
+            {/* {equipmentData[order.equipmentId]?.name || "Loading Equipment..."} */}
+            {order.equipmentName || "Loading Equipment..."}
           </Card.Title>
           <Card.Text>
-            <strong>Quantity:</strong> {order.quantity}
+            <strong>Quantity:</strong> {order.equipmentQuantity}
           </Card.Text>
           <Card.Text>
-            <strong>Total Price:</strong> ₹{order.totalPrice}
+            <strong>Total Price:</strong> ₹{order.totalAmount}
           </Card.Text>
           <Card.Text>
             <strong>Status:</strong> {order.status}

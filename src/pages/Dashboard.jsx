@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-export default function Index() {
+export default function Dashboard() {
   const navigate=useNavigate();
   return (
     <div className="d-flex flex-column min-vh-100 bg-dark text-white">

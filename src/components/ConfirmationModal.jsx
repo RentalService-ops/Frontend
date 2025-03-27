@@ -1,7 +1,7 @@
 import { MdCancel } from "react-icons/md";
 
 export default function ConfirmationModal({ visible, onClose, onConfirm, actionType }) {
-    if (visible) return null;
+    if (!visible) return null;
   
     return (
       <div className="modal show" style={{ display: "block", background:"rgba(0, 0, 0, 0.5)" }} onClick={onClose}>

@@ -1,46 +1,59 @@
-import React from 'react';
-import { useCookies } from 'react-cookie';
-import { useNavigate } from 'react-router-dom';
-const NavBar = () => {
-  const [cookie,setCookie,removeCookie]=useCookies();
-  const navigate=useNavigate();
+import React from "react";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
-  function handleLogOut(){
-    console.log("logged out")
-    removeCookie("jwtToken");
-    removeCookie("role")
-    if(!cookie.jwtToken && !cookie.role){
-    navigate("/")
-    }
+const NavBar = () => {
+  const [cookies, , removeCookie] = useCookies(["jwtToken", "role"]);
+  const navigate = useNavigate();
+
+  function handleLogOut() {
+    console.log("Logged out");
+    removeCookie("jwtToken", { path: "/" });
+    removeCookie("role", { path: "/" });
+
+    navigate("/"); // Redirect to home page after logout
+    window.location.reload(); // Force navbar to update
   }
 
-  function handleLogIn(){
-    navigate("/login")
+  function handleLogIn() {
+    navigate("/login");
+  }
+
+  function handleRegister() {
+    navigate("/register");
   }
 
   return (
-  <nav className="navbar navbar-expand-lg navbar-light bg-light ms-2">
-    <a className="navbar-brand" href="/">Rental Service</a>
-      <ul className="navbar-nav me-auto"> {/* me-auto aligns navbar items to the left */}
+    <nav className="navbar navbar-expand-lg navbar-light bg-light ms-2">
+      <a className="navbar-brand" href="/">Rental Service</a>
+      <ul className="navbar-nav me-auto">
         <li className="nav-item">
-          <a className="nav-link active" aria-current="page" href="/contact-us">Contact Us</a>
+          <a className="nav-link active" href="/contact-us">Contact Us</a>
         </li>
-        <li className="nav-item">
-          <a className="nav-link active" aria-current="page" href="/profile">Profile</a>
-        </li>
+        {cookies.jwtToken && (
+          <li className="nav-item">
+            <a className="nav-link active" href="/profile">Profile</a>
+          </li>
+        )}
       </ul>
 
-    {cookie.jwtToken && cookie.role ? <div className="d-flex">
-      <button type="button" className="btn btn-outline-danger" onClick={handleLogOut}>Log Out</button>
-      </div> : 
-      <div className="d-flex">
-      <button type="button" className="btn btn-outline-danger" onClick={handleLogIn}>Log In</button>
-      </div> 
-    }
-</nav>
-
-  
-
+      {cookies.jwtToken ? (
+        <div className="d-flex">
+          <button type="button" className="btn btn-outline-danger" onClick={handleLogOut}>
+            Log Out
+          </button>
+        </div>
+      ) : (
+        <div className="d-flex gap-2">
+          <button type="button" className="btn btn-outline-primary" onClick={handleLogIn}>
+            Log In
+          </button>
+          <button type="button" className="btn btn-outline-success" onClick={handleRegister}>
+            Register
+          </button>
+        </div>
+      )}
+    </nav>
   );
 };
 
