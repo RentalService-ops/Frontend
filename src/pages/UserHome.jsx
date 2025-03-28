@@ -1,40 +1,39 @@
-import {useState } from "react";
-import SideBar from "../components/SideBar"
+import { useState } from "react";
 import UserDashboard from "../components/UserDashboard";
-import OrderPage from "../components/OrderPage"
+import OrderPage from "../components/OrderPage";
 import { FaHome } from "react-icons/fa";
 import { IoAddCircleOutline } from "react-icons/io5";
+import Sidebar from "../components/SideBar";
 
-export default function HomePage() {
+export default function HomePage({isSidebarOpen}) {
+  const [activeLink, setActiveLink] = useState("Home");
 
-  const [activeLink,setActiveLink]=useState("Home");
-  function returnComponent(){
-    if(activeLink==="Home"){
-      return <UserDashboard />
+  const renderComponent = () => {
+    switch (activeLink) {
+      case "Home":
+        return <UserDashboard />;
+      case "My Orders":
+        return <OrderPage />;
+      default:
+        return <UserDashboard />;
     }
-    else if(activeLink==="My Orders"){
-      return <OrderPage />
-    }
-  }
+  };
 
-    const linkData=[
-      {
-        label:"Home",
-        displayButton:<FaHome />
-      },
-      {
-        label:"My Orders",
-        displayButton:<IoAddCircleOutline />
-      }
-    ];
+  const linkData = [
+    { label: "Home", displayButton: <FaHome /> },
+    { label: "My Orders", displayButton: <IoAddCircleOutline /> },
+  ];
 
- 
   return (
-    <div className="d-flex">
-      <SideBar setActiveLink={setActiveLink} activeLink={activeLink} linkData={linkData}/>
-      <div>
-      {returnComponent()}
-      </div>
-    </div>
+    <div className="d-flex flex-column min-vh-100">
+  <div className="d-flex flex-grow-1">
+    <Sidebar isOpen={isSidebarOpen} linkData={linkData} activeLink={activeLink} setActiveLink={setActiveLink} />
+    <div className="flex-grow-1 p-3">{renderComponent()}</div>
+  </div>
+  {/* <Footer /> */}
+</div>
+
+
   );
 }
+

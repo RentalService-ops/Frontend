@@ -7,7 +7,7 @@ import { FaHome } from "react-icons/fa";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { AiOutlineAppstore } from "react-icons/ai";
 import Equipments from '../components/Equipments';
-const RentalHome = () => {
+const RentalHome = ({isSidebarOpen}) => {
   const [activeLink,setActiveLink]=useState("Home");
   function returnComponent(){
     if(activeLink==="Home"){
@@ -43,7 +43,7 @@ const RentalHome = () => {
   ];
   return (
     <div className="d-flex" >
-    <Sidebar setActiveLink={setActiveLink} activeLink={activeLink} linkData={linkData}/>
+    <Sidebar isOpen={isSidebarOpen} setActiveLink={setActiveLink} activeLink={activeLink} linkData={linkData}/>
     {returnComponent()}
     </div>
   );

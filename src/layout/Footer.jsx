@@ -1,9 +1,9 @@
-export default function Footer(){
-    return (
-        <div className="bg-gray-100"style={{width:"100vw"}}>
-        <footer className="py-3">
-          <p className="text-center text-body-secondary">© Rental Service, Inc</p>
-        </footer>
-        </div>
-    )
+export default function Footer() {
+  return (
+    <footer className="bg-light text-center text-lg-start py-3 w-100">
+      <div className="container">
+        <p className="text-muted">© Rental Service, Inc</p>
+      </div>
+    </footer>
+  );
 }
