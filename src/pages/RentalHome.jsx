@@ -42,10 +42,12 @@ const RentalHome = ({isSidebarOpen}) => {
     }
   ];
   return (
-    <div className="d-flex" >
-    <Sidebar isOpen={isSidebarOpen} setActiveLink={setActiveLink} activeLink={activeLink} linkData={linkData}/>
-    {returnComponent()}
+    <div className="d-flex flex-column min-vh-100">
+    <div className="d-flex flex-grow-1 h-100">
+    <Sidebar isOpen={isSidebarOpen} linkData={linkData} activeLink={activeLink} setActiveLink={setActiveLink} />
+      <div className="flex-grow-1 p-3">{returnComponent()}</div>
     </div>
+  </div>
   );
 };
 

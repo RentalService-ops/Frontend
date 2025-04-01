@@ -28,7 +28,6 @@ const UserDashboard = ({ isSidebarOpen }) => {
         const response = await axios.get("http://localhost:8080/api/category/getAllCategory", {
           headers: { Authorization: `Bearer ${cookies.jwtToken}` },
         });
-        
         setCategories(response.data.body);
       } catch (error) {
         console.error("Error fetching categories:", error);

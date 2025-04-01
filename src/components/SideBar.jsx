@@ -14,7 +14,7 @@ const Sidebar = ({ activeLink, setActiveLink, linkData, isOpen }) => {
 
   return (
     <div
-      className={`bg-dark text-white p-3 ${isOpen ? 'position-sticky' : 'position-fixed'}`}
+      className={`bg-dark text-white p-3 ${isOpen ? 'sticky-top' : 'position-fixed'}`}
       style={{
         width: "280px",
         height: "100vh",

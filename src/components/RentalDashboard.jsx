@@ -165,7 +165,8 @@ export default function RentalDashboard() {
   }
 
   return (
-    <div className="container" style={{ overflow: "scroll" }}>
+    <div className="container" >
+      <h3>Pending bookings</h3>
       <Table
         bookings={bookings?.filter((booking) => booking.status === "PENDING")}
         config={config.filter((eachConfig) => eachConfig.label !== "Status")}
@@ -176,6 +177,7 @@ export default function RentalDashboard() {
       <br />
       <br />
 
+      <h3>Booking History</h3>
       <Table
         bookings={bookings?.filter((booking) => booking.status !== "PENDING")}
         config={config.filter((eachConfig) => eachConfig.label !== "")}

@@ -22,7 +22,7 @@ const Navbar = ({ toggleSidebar }) => {
           onClick={toggleSidebar} 
           aria-label="Toggle sidebar"
         >
-          <i className="bi bi-list"></i>
+          <i className="bi bi-list"><img src="hamburger.png" style={{height:"auto",width:"25px"}}/></i>
         </button>
         <Link className="navbar-brand" to="/">Rental Service</Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

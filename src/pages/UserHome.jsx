@@ -26,11 +26,10 @@ export default function UserHome({isSidebarOpen}) {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-  <div className="d-flex flex-grow-1">
+  <div className="d-flex flex-grow-1 h-100">
     <Sidebar isOpen={isSidebarOpen} linkData={linkData} activeLink={activeLink} setActiveLink={setActiveLink} />
     <div className="flex-grow-1 p-3">{renderComponent()}</div>
   </div>
-  {/* <Footer /> */}
 </div>
 
 

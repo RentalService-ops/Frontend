@@ -9,18 +9,6 @@ import { jwtDecode } from 'jwt-decode';
 
 const LoginPage = ({setIsAuthenticated}) => {
   const [cookies,setCookie]=useCookies(['jwtToken','role'])
-  const getHomeRoute = (role) => {
-    switch (role) {
-      case "admin":
-        return "/admin-home";
-      case "rental":
-        return "/rental-home";
-      case "user":
-        return "/user-home";
-      default:
-        return "/login"; // Redirect to login if role is invalid
-    }
-  };
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
@@ -50,55 +38,29 @@ const LoginPage = ({setIsAuthenticated}) => {
     return Object.keys(errors).length === 0;
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   if (validateForm()) {
-  //     console.log('Logging in with:', formData);
-      
-  //     try{
-  //       const response=await axios.post("http://localhost:8080/login",{
-  //         email:formData.email,
-  //         password:formData.password
-  //       },{withCredentials:true})
-  //       let userRole=jwtDecode(response.data.token).role;
-  //       console.log(userRole)
-  //       setCookie('role',userRole, { path: "/", maxAge: 86400 })
-  //       setIsAuthenticated(true)
-  //       if (userRole === "admin") navigate("/admin-home");
-  //       else if (userRole === "rental") navigate("/rental-home");
-  //       else navigate("/user-home"); // Default for 'user'
-  //     }
-  //     catch(err){
-  //       console.log(err)
-  //     }
-  //   }
-  // };
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (await validateForm()) { // Ensure validation is awaited
-      console.log('Logging in with:', formData);
-  
-      try {
-        const response = await axios.post("http://localhost:8080/login", {
-          email: formData.email,
-          password: formData.password
-        }, { withCredentials: true });
-  
-        let userRole = jwtDecode(response.data.token).role;
-        console.log(userRole);
-  
-        setCookie('role', userRole, { path: "/", maxAge: 86400 });
-        setIsAuthenticated(true);
-        navigate(getHomeRoute(userRole)); // Use getHomeRoute for navigation
-  
-      } catch (err) {
-        console.log(err);
+    if (validateForm()) {
+      
+      try{
+        const response=await axios.post("http://localhost:8080/login",{
+          email:formData.email,
+          password:formData.password
+        },{withCredentials:true})
+        let userRole=jwtDecode(response.data.token).role;
+        setIsAuthenticated(true)
+        setTimeout(() => {
+          if (userRole === "admin") navigate("/admin-home");
+          else if (userRole === "rental") navigate("/rental-home");
+          else navigate("/user-home");
+        }, 2000);
+      }
+      catch(err){
+        console.log(err)
       }
     }
   };
-  
+
   return (
 
     <div className="login-container">
