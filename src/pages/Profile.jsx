@@ -65,6 +65,8 @@ export default function ProfilePage() {
   };
 
   const handleUpdateProfile = async () => {
+    console.log(formData);
+    
     try {
       await axios.post(`http://localhost:8080/api/user/updateUser`, formData, {
         headers: { Authorization: `Bearer ${cookies.jwtToken}` },
@@ -127,8 +129,8 @@ export default function ProfilePage() {
         style={{ width: "150px" }}
       />
       <p className="text-muted mb-1 fw-bold">{user.username}</p>
-      <p className="text-muted mb-1">{user.email}</p>
-      <p className="text-muted mb-3">{user.phoneNo}</p> 
+      <p className="text-muted mb-1">{user.email}</p> {/* Moved email here */}
+      <p className="text-muted mb-3">{user.phoneNo}</p> {/* Moved phone number here */}
       <Button variant="primary" onClick={() => setShowProfileModal(true)}>
         Edit Profile
       </Button>

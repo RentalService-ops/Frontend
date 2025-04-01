@@ -5,7 +5,7 @@ import { FaHome } from "react-icons/fa";
 import { IoAddCircleOutline } from "react-icons/io5";
 import Sidebar from "../components/SideBar";
 
-export default function HomePage({isSidebarOpen}) {
+export default function UserHome({isSidebarOpen}) {
   const [activeLink, setActiveLink] = useState("Home");
 
   const renderComponent = () => {

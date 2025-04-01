@@ -50,30 +50,55 @@ const LoginPage = ({setIsAuthenticated}) => {
     return Object.keys(errors).length === 0;
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (validateForm()) {
+  //     console.log('Logging in with:', formData);
+      
+  //     try{
+  //       const response=await axios.post("http://localhost:8080/login",{
+  //         email:formData.email,
+  //         password:formData.password
+  //       },{withCredentials:true})
+  //       let userRole=jwtDecode(response.data.token).role;
+  //       console.log(userRole)
+  //       setCookie('role',userRole, { path: "/", maxAge: 86400 })
+  //       setIsAuthenticated(true)
+  //       if (userRole === "admin") navigate("/admin-home");
+  //       else if (userRole === "rental") navigate("/rental-home");
+  //       else navigate("/user-home"); // Default for 'user'
+  //     }
+  //     catch(err){
+  //       console.log(err)
+  //     }
+  //   }
+  // };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
+    if (await validateForm()) { // Ensure validation is awaited
       console.log('Logging in with:', formData);
-      
-      try{
-        const response=await axios.post("http://localhost:8080/login",{
-          email:formData.email,
-          password:formData.password
-        },{withCredentials:true})
-        let userRole=jwtDecode(response.data.token).role;
-        console.log(userRole)
-        setCookie('role',userRole, { path: "/", maxAge: 86400 })
-        setIsAuthenticated(true)
-        if (userRole === "admin") navigate("/admin-home");
-        else if (userRole === "rental") navigate("/rental-home");
-        else navigate("/user-home"); // Default for 'user'
-      }
-      catch(err){
-        console.log(err)
+  
+      try {
+        const response = await axios.post("http://localhost:8080/login", {
+          email: formData.email,
+          password: formData.password
+        }, { withCredentials: true });
+  
+        let userRole = jwtDecode(response.data.token).role;
+        console.log(userRole);
+  
+        setCookie('role', userRole, { path: "/", maxAge: 86400 });
+        setIsAuthenticated(true);
+        navigate(getHomeRoute(userRole)); // Use getHomeRoute for navigation
+  
+      } catch (err) {
+        console.log(err);
       }
     }
   };
-
+  
   return (
 
     <div className="login-container">

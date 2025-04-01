@@ -13,6 +13,7 @@ function SignupPage() {
     role:''
   });
 
+  const navigate = useNavigate();
 
   const [errors, setErrors] = useState({});
   const [isPasswordShown, setIsPasswordShown] = useState(false);
@@ -73,7 +74,7 @@ function SignupPage() {
     if (await validateForm()) {
       try{
         await axios.post("http://localhost:8080/register",formData)
-        useNavigate("/login")
+        navigate("/login")
       }
       catch(err){
         console.log(err.message)
