@@ -21,7 +21,7 @@ export default function AddCategory() {
 
         try {
             const response = await axios.post(
-                "http://localhost:8080/api/rental/addCategory",
+                "http://localhost:8080/api/category/addCategory",
                 {
                     user: { id: userId },
                     name: categoryName.current.value,

@@ -36,11 +36,11 @@ export default function AddEquipment() {
         async function getCategories() {
             if (!userId) return;
             try {
-                const response = await axios.get(`http://localhost:8080/api/rental/category/${userId}`, {
+                const response = await axios.get(`http://localhost:8080/api/category/category/${userId}`, {
                     headers: { Authorization: `Bearer ${cookie.jwtToken}` },
                     withCredentials: true
                 });
-                setCategories(response.data);
+                setCategories(response.data.body);
             } catch (err) {
                 console.error("Error fetching categories:", err);
             }

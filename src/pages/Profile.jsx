@@ -127,8 +127,8 @@ export default function ProfilePage() {
         style={{ width: "150px" }}
       />
       <p className="text-muted mb-1 fw-bold">{user.username}</p>
-      <p className="text-muted mb-1">{user.email}</p> {/* Moved email here */}
-      <p className="text-muted mb-3">{user.phoneNo}</p> {/* Moved phone number here */}
+      <p className="text-muted mb-1">{user.email}</p>
+      <p className="text-muted mb-3">{user.phoneNo}</p> 
       <Button variant="primary" onClick={() => setShowProfileModal(true)}>
         Edit Profile
       </Button>
@@ -260,8 +260,8 @@ export default function ProfilePage() {
         <Form.Label>Phone Number</Form.Label>
         <Form.Control
           type="text"
-          value={formData.phoneNumber || ""}
-          onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+          value={formData.phoneNo || ""}
+          onChange={(e) => setFormData({ ...formData, phoneNo: e.target.value })}
         />
       </Form.Group>
     </Form>

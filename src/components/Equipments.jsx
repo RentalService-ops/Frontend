@@ -52,6 +52,7 @@ export default function Equipments(){
    ]
    const [equipmentData,setEquipmentData]=useState(data);
    const [showModal,setShowModal]=useState(false);
+   const [imageUrls, setImageUrls] = useState({});
 
    useEffect(()=>{
     const controller=new AbortController();
@@ -69,6 +70,7 @@ export default function Equipments(){
             signal:signal
         })
         setEquipmentData(response.data);
+        fetchImages(response.data);
         }
         catch(err){
             console.log(err.message);
@@ -121,12 +123,34 @@ export default function Equipments(){
         console.log(err.message)
     }
    }
+
+     // Fetch Images Function
+  const fetchImages = async (data) => {
+    const imageMap = {};
+    await Promise.all(
+      data.map(async (item) => {
+        try {
+          const imageResponse = await axios.get(`http://localhost:8080/api/equipment/${item.imageUrl}`, {
+            headers: { Authorization: `Bearer ${cookie.jwtToken}` },
+            responseType: "blob",
+            withCredentials: true,
+          });
+          imageMap[item.imageUrl] = URL.createObjectURL(imageResponse.data);
+          console.log(imageMap)
+        } catch {
+          imageMap[item.imageUrl] = "/defaultImage.png";
+        }
+      })
+    );
+    setImageUrls(imageMap);
+  };
+
     return(
         <div className="d-flex flex-wrap gap-3 equipment-container">
         {equipmentData.map((value,index)=>{
             return(
                 <div className="card ms-1 mb-5" style={{width: "20rem",height:"fit-content"}} key={index}>
-                    <img src="GetImage.png" className="card-img-top" alt="..." style={{width:"100%",height:"auto"}}/>
+                    <img src={imageUrls[value.imageUrl] || "/defaultImage.png"} className="card-img-top" alt="..." style={{width:"100%",height:"auto"}}/>
                         <div className="card-body p-1.5" >
                             <h5 className="card-text">Name: {value.name}</h5>
                             <p className="card-text">Price Per Day: {value.pricePerDay}</p>

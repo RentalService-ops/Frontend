@@ -51,9 +51,13 @@ function EditEquipmentForm({ notShow, values, handleAfterEdit }) { //to add func
       <div className="position-fixed top-0 bottom-0 end-0 start-0 bg-secondary opacity-75" style={{ zIndex: 1050 }}></div>
       <div className="position-fixed top-50 start-50 translate-middle bg-white login-container" style={{ zIndex: 1060, height: "fit-content" }}>
         <h1>Edit Equipment Details : </h1>
+        <label>Name: </label>
         <input type="text" name="name" className="form-control mb-3" value={formData.name} onChange={handleChange} />
+        <label>Quantity:</label>
         <input type="number" name="quantity" className="form-control mb-3" value={formData.quantity} onChange={handleChange} />
+        <label>Price Per Day:</label>
         <input type="number" name="pricePerDay" className="form-control mb-3" value={formData.pricePerDay} onChange={handleChange} />
+        <label>Description</label>
         <textarea name="description" className="form-control mb-3" id="exampleFormControlTextarea1" rows="3" required={true} onChange={handleChange} value={formData.description}></textarea>
         <div className="d-flex justify-content-between">
           <button className="btn btn-primary" onClick={handleClick}>Edit Details</button>

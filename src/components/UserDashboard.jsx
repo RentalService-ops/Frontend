@@ -13,7 +13,7 @@ const HomePage = ({ isSidebarOpen }) => {
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 6;
+  const productsPerPage = 3;
 
   useEffect(() => {
     const fetchProducts = async () => {
