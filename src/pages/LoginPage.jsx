@@ -1,76 +1,100 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import '../styles/index.css'
+import { useState, useEffect, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "../styles/index.css";
 import SocialLogin from "../components/SocialLogin";
 import { useCookies } from "react-cookie";
-import axios from "axios"
-import { jwtDecode } from 'jwt-decode';
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
-
-const LoginPage = ({setIsAuthenticated}) => {
-  const [cookies,setCookie]=useCookies(['jwtToken','role'])
-
-  const [formData, setFormData] = useState({ email: '', password: '' });
+const LoginPage = ({ setIsAuthenticated, isAuthenticated }) => {
+  const [cookies, setCookie] = useCookies(["jwtToken", "role"]);
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate(); 
+  const [loginError, setLoginError] = useState(""); // Store login error message
+  const navigate = useNavigate();
 
+  const getHomeRoute = useCallback((role) => {
+    switch (role) {
+      case "admin":
+        return "/admin-home";
+      case "rental":
+        return "/rental-home";
+      case "user":
+        return "/user-home";
+      default:
+        return "/login";
+    }
+  }, []);
 
   const validateForm = async () => {
     const errors = {};
-    // Email Validation
     if (!formData.email) {
-      errors.email = 'Email is required.';
+      errors.email = "Email is required.";
     } else {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailPattern.test(formData.email)) {
-        errors.email = 'Enter a valid email.';
-      } 
+        errors.email = "Enter a valid email.";
+      }
     }
 
-    // Password Validation
     if (!formData.password) {
-      errors.password = 'Password is required.';
+      errors.password = "Password is required.";
     }
-    // else if (formData.password.length < 6) {
-    //   errors.password = 'Password must be at least 6 characters.';
-    // }
+
     setErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
+  
+    if (!(await validateForm())) return;
+  
+    try {
+      const response = await axios.post("http://localhost:8080/login", {
+        email: formData.email,
+        password: formData.password
+      }, { withCredentials: true });
+  
+      let userRole = jwtDecode(response.data.token).role;
+      console.log("User Role:", userRole);
+  
+      setCookie("role", userRole, { path: "/", maxAge: 86400, sameSite: "Strict" });
       
-      try{
-        const response=await axios.post("http://localhost:8080/login",{
-          email:formData.email,
-          password:formData.password
-        },{withCredentials:true})
-        let userRole=jwtDecode(response.data.token).role;
-        setIsAuthenticated(true)
-        setTimeout(() => {
-          if (userRole === "admin") navigate("/admin-home");
-          else if (userRole === "rental") navigate("/rental-home");
-          else navigate("/user-home");
-        }, 2000);
-      }
-      catch(err){
-        console.log(err)
-      }
+      setIsAuthenticated(true);
+  
+      setTimeout(() => {
+        navigate(getHomeRoute(userRole)); // Navigate first
+        window.location.reload(); // Reload after navigation
+      }, 1);
+      
+    } catch (err) {
+      console.error("Login Error:", err);
     }
   };
+  
+  useEffect(() => {
+    if (isAuthenticated && cookies.role) {
+      navigate(getHomeRoute(userRole)); // Navigate first
+      setTimeout(() => {
+        window.location.reload(); // Then reload after a short delay
+      }, 300);
+    }
+  }, [isAuthenticated, cookies.role, navigate, getHomeRoute]);
 
   return (
-
     <div className="login-container">
       <form className="login-form" onSubmit={handleSubmit} noValidate>
         <h2 className="form-title">Login</h2>
         <SocialLogin />
-        <p className="separator"><span>or</span></p>
-        <div className="form-group">
-          <div className='input-wrapper'>
+        <p className="separator">
+          <span>or</span>
+        </p>
 
+        {loginError && <p className="error-message">{loginError}</p>}
+
+        <div className="form-group">
+          <div className="input-wrapper">
             <i className="material-symbols-outlined">mail</i>
             <input
               type="text"
@@ -86,7 +110,7 @@ const LoginPage = ({setIsAuthenticated}) => {
         </div>
 
         <div className="form-group">
-          <div className='input-wrapper'>
+          <div className="input-wrapper">
             <i className="material-symbols-outlined">lock</i>
             <input
               type="password"
@@ -101,7 +125,9 @@ const LoginPage = ({setIsAuthenticated}) => {
           </div>
         </div>
 
-        <button type="submit" className="login-button">Log In</button>
+        <button type="submit" className="login-button">
+          Log In
+        </button>
 
         <p className="signup-prompt">
           Don&apos;t have an account? <Link to="/register">Sign Up</Link>
@@ -109,5 +135,6 @@ const LoginPage = ({setIsAuthenticated}) => {
       </form>
     </div>
   );
-}
+};
+
 export default LoginPage;
