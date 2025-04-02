@@ -3,7 +3,7 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 
-export default function AddEquipment() {
+export default function AddEquipment({setShowAddEquipment}) {
     const fileRef = useRef();
     const [imageSrc, setImageSrc] = useState("");
     const [categories, setCategories] = useState([]);
@@ -107,6 +107,8 @@ export default function AddEquipment() {
     }
 
     return (
+        <>
+        <button className="btn btn-primary position-absolute" style={{right:"0px"}} onClick={()=>setShowAddEquipment(false)}>Go Back</button>
         <div className="login-container">
             <h3 style={{ textAlign: "center" }}>Add a new Equipment</h3>
             {userRole !== "rental" && (
@@ -198,5 +200,6 @@ export default function AddEquipment() {
                 </button>
             </form>
         </div>
+        </>
     );
 }

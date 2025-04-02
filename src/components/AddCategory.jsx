@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 
-export default function AddCategory() {
+export default function AddCategory({setShowAddCategory}) {
     const [cookies] = useCookies(["jwtToken"]);
     const userId = jwtDecode(cookies.jwtToken).user_id;
 
@@ -46,6 +46,8 @@ export default function AddCategory() {
     }
 
     return (
+        <>
+        <button className="btn btn-primary position-absolute" style={{right:"0px"}} onClick={()=>setShowAddCategory(false)}>Go Back</button>
         <div className="add-category-container">
             <h3 style={{ textAlign: "center" }}>Add a New Category</h3>
             <div className="mb-3">
@@ -69,5 +71,6 @@ export default function AddCategory() {
                 Add Category
             </button>
         </div>
+        </>
     );
 }

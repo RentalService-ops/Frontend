@@ -3,7 +3,7 @@ import UserDashboard from "../components/UserDashboard";
 import OrderPage from "../components/OrderPage";
 import { FaHome } from "react-icons/fa";
 import { IoAddCircleOutline } from "react-icons/io5";
-import Sidebar from "../components/SideBar";
+import Sidebar from "../layout/SideBar";
 
 export default function UserHome({isSidebarOpen}) {
   const [activeLink, setActiveLink] = useState("Home");

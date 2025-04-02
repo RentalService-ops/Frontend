@@ -4,6 +4,7 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import { Card, Button } from "react-bootstrap";
 import ProductModal from "./ProductModal";
+import Pagination from "./Pagination";
 
 const UserDashboard = ({ isSidebarOpen }) => {
   const [cookies] = useCookies(["jwtToken"]);
@@ -112,8 +113,6 @@ const UserDashboard = ({ isSidebarOpen }) => {
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-
   return (
     <div
       className="d-flex flex-column min-vh-100"
@@ -158,7 +157,7 @@ const UserDashboard = ({ isSidebarOpen }) => {
         </div>
 
         {/* Product Grid */}
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-3">
           {currentProducts.map((product) => (
             <div className="col" key={product.equipmentId}>
               <Card className="shadow border-0 h-100" onClick={() => handleProductClick(product)}>
@@ -186,32 +185,9 @@ const UserDashboard = ({ isSidebarOpen }) => {
           ))}
         </div>
 
-        {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <nav className="mt-4">
-            <ul className="pagination justify-content-center">
-              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>
-                  Previous
-                </button>
-              </li>
+        <Pagination data={filteredProducts} currentPage={currentPage} setCurrentPage={setCurrentPage}
+        productsPerPage={productsPerPage}/>
 
-              {[...Array(totalPages)].map((_, index) => (
-                <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(index + 1)}>
-                    {index + 1}
-                  </button>
-                </li>
-              ))}
-
-              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>
-                  Next
-                </button>
-              </li>
-            </ul>
-          </nav>
-        )}
       </div>
 
       {selectedProduct && (

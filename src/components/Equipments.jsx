@@ -3,16 +3,20 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import EditForm from "./EditEquipmentForm";
 import { jwtDecode } from "jwt-decode";
+import AddEquipment from "./AddEquipment";
+import Pagination from "./Pagination";
 export default function Equipments() {
     const [cookie] = useCookies()
     const [editableValue, setEditableValue] = useState({})
     const [equipmentData, setEquipmentData] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [imageUrls, setImageUrls] = useState({});
+    const [showAddEquipment, setShowAddEquipment] = useState(false);
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const productsPerPage = 4;
+    const productsPerPage = 6;
+
 
     useEffect(() => {
         const controller = new AbortController();
@@ -33,7 +37,7 @@ export default function Equipments() {
                 fetchImages(response.data);
             }
             catch (err) {
-                console.log(err.message);
+                console.log(err);
             }
         }
         fetchEquipmentData();
@@ -108,57 +112,38 @@ export default function Equipments() {
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = equipmentData.slice(indexOfFirstProduct, indexOfLastProduct);
-
-    const totalPages = Math.ceil(equipmentData.length / productsPerPage);
-
     return (
         <div>
-            {/* Pagination Controls */}
-            {totalPages >= 1 && (
-                <nav className="mb-0">
-                    <ul className="pagination justify-content-center">
-                        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                            <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>
-                                Previous
-                            </button>
-                        </li>
+            {!showAddEquipment ? <>
+                <div className="mb-5">
+                    <button className="btn btn-primary position-absolute mb-5" style={{ right: "0px" }}
+                        onClick={() => setShowAddEquipment(true)}>Add Equipment</button>
 
-                        {[...Array(totalPages)].map((_, index) => (
-                            <li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
-                                <button className="page-link" onClick={() => setCurrentPage(index + 1)}>
-                                    {index + 1}
-                                </button>
-                            </li>
-                        ))}
+                    <Pagination data={equipmentData} currentPage={currentPage} setCurrentPage={setCurrentPage}
+                        productsPerPage={productsPerPage} />
+                </div>
 
-                        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                            <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>
-                                Next
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-            )}
-            <div className="d-flex flex-wrap gap-3 equipment-container">
-                {currentProducts.map((value, index) => {
-                    return (
-                        <div className="card ms-1 mb-5" style={{ width: "20rem", height: "fit-content" }} key={index}>
-                            <img src={imageUrls[value.imageUrl] || "/defaultImage.png"} className="card-img-top" alt="..." style={{ width: "100%", height: "auto" }} />
-                            <div className="card-body p-1.5" >
-                                <h5 className="card-text">Name: {value.name}</h5>
-                                <p className="card-text">Price Per Day: {value.pricePerDay}</p>
-                                <p className="card-text">Quantity: {value.quantity}</p>
-                                <p className="card-text">Description: {value.description}</p>
-                                <div className="d-flex justify-content-between">
-                                    <button className="btn btn-primary mb-0" onClick={() => handleEdit(value)}>Edit</button>
-                                    <button className="btn btn-danger mb-0" onClick={() => handleDelete(value.equipmentId)}>Delete</button>
+                <div className="d-flex justify-content-evenly flex-wrap gap-3 equipment-container">
+                    {currentProducts.map((value, index) => {
+                        return (
+                            <div className="card ms-1 mb-5" style={{ width: "20rem", height: "fit-content" }} key={index}>
+                                <img src={imageUrls[value.imageUrl] || "/defaultImage.png"} className="card-img-top" alt="..." style={{ width: "100%", height: "auto" }} />
+                                <div className="card-body p-1.5" >
+                                    <h5 className="card-text">Name: {value.name}</h5>
+                                    <p className="card-text">Price Per Day: {value.pricePerDay}</p>
+                                    <p className="card-text">Quantity: {value.quantity}</p>
+                                    <p className="card-text">Description: {value.description}</p>
+                                    <div className="d-flex justify-content-between">
+                                        <button className="btn btn-primary mb-0" onClick={() => handleEdit(value)}>Edit</button>
+                                        <button className="btn btn-danger mb-0" onClick={() => handleDelete(value.equipmentId)}>Delete</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )
-                })}
-            </div>
-            {showModal && <EditForm notShow={() => setShowModal(!showModal)} values={editableValue} handleAfterEdit={handleAfterEdit} />}
+                        )
+                    })}
+                </div>
+                {showModal && <EditForm notShow={() => setShowModal(!showModal)} values={editableValue} handleAfterEdit={handleAfterEdit} />
+                }</> : <AddEquipment setShowAddEquipment={setShowAddEquipment} />}
         </div>
     );
 }

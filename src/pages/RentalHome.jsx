@@ -1,25 +1,21 @@
 import {React,useState} from 'react';
-import Sidebar from "../components/SideBar"
+import Sidebar from "../layout/SideBar"
 import RentalDashboard from '../components/RentalDashboard';
-import AddCategory from '../components/AddCategory';
-import AddEquipment from '../components/AddEquipment'
 import { FaHome } from "react-icons/fa";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { AiOutlineAppstore } from "react-icons/ai";
 import Equipments from '../components/Equipments';
+import Categories from '../components/Categories';
 const RentalHome = ({isSidebarOpen}) => {
   const [activeLink,setActiveLink]=useState("Home");
   function returnComponent(){
     if(activeLink==="Home"){
       return <RentalDashboard />
     }
-    else if(activeLink==="Add Category"){
-      return <AddCategory />
+    else if(activeLink==="My Categories"){
+      return <Categories />
     }
-    else if(activeLink==="Add Equipment"){
-      return <AddEquipment />
-    }
-    else if(activeLink==="Equipments"){
+    else if(activeLink==="My Equipments"){
       return <Equipments />
     }
   }
@@ -29,15 +25,11 @@ const RentalHome = ({isSidebarOpen}) => {
       displayButton:<FaHome />
     },
     {
-      label:"Add Category",
+      label:"My Categories",
       displayButton:<IoAddCircleOutline />
     },
     {
-      label:"Add Equipment",
-      displayButton:<IoAddCircleOutline />
-    },
-    {
-      label:"Equipments",
+      label:"My Equipments",
       displayButton:<AiOutlineAppstore />
     }
   ];

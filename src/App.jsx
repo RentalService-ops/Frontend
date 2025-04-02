@@ -52,7 +52,7 @@ function App() {
           <Routes>
             <Route path="/" element={isAuthenticated ? <Navigate to={getHomeRoute()} /> : <Dashboard />} />
             <Route path="/admin-home" element={isAuthenticated && cookies?.role === "admin" ? <AdminHome /> : <Navigate to="/login" />} />
-            <Route path="/rental-home" element={isAuthenticated && cookies?.role === "rental" ? <RentalHome isSidebarOpen={isSidebarOpen} /> : <Navigate to="/login" />} />
+            <Route path="/rental-home" element={isAuthenticated && cookies?.role === "rental" ? <RentalHome isSidebarOpen={isSidebarOpen}/> : <Navigate to="/login" />} />
             <Route path="/user-home" element={isAuthenticated && cookies?.role === "user" ? <UserHome isSidebarOpen={isSidebarOpen}/> : <Navigate to="/login" />} />
             <Route path="/login" element={isAuthenticated ? <Navigate to={getHomeRoute()} /> : <LoginPage setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
@@ -65,3 +65,5 @@ function App() {
 }
 
 export default App;
+
+
