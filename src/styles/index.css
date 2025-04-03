@@ -188,5 +188,8 @@
   left: 0;
   right: 0;
   background-color: white; /* Optional: Adjust if necessary */
-  z-index: 999; /* Ensures the pagination stays above other content */
-}
+   z-index: 999;
+} 
+
+
+

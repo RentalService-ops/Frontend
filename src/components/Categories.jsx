@@ -1,111 +1,160 @@
 import { useEffect, useState } from "react";
 import AddCategory from "./AddCategory";
-import Pagination from "./Pagination";
+import EditCategory from "./EditCategory";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import Pagination from "./Pagination";
 
-export default function Categories() {
+export default function Categories({ isSidebarOpen }) {
     const [showAddCategory, setShowAddCategory] = useState(false);
     const [categoryData, setCategoryData] = useState([]);
-    const [cookies] = useCookies();
-    const id = jwtDecode(cookies.jwtToken).user_id;
-
-    // Pagination
+    const [cookies] = useCookies(["jwtToken"]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const productsPerPage = 2;
+    const categoriesPerPage = 6;
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
     useEffect(() => {
-        const controller = new AbortController();
-        const signal = controller.signal;
+        fetchCategories();
+    }, [cookies]);
 
-        async function fetchData() {
-            try {
-                const response = await axios.get(`http://localhost:8080/api/category/category/${id}`, {
-                    headers: { Authorization: `Bearer ${cookies.jwtToken}` },
-                    withCredentials: true,
-                    signal
-                });
-                setCategoryData(response.data.body);
-            } catch (err) {
-                console.log("Error fetching categories:", err.message);
+    const fetchCategories = async () => {
+        try {
+            const token = cookies.jwtToken;
+            if (!token) {
+                setError("Authentication token is missing.");
+                setLoading(false);
+                return;
             }
-        }
 
-        fetchData();
-        return () => {
-            controller.abort();
-        };
-    }, [id, cookies.jwtToken]);
+            const decodedToken = jwtDecode(token);
+            const userId = decodedToken.user_id;
+
+            const response = await axios.get(`http://localhost:8080/api/category/category/${userId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true
+            });
+
+            setCategoryData(response.data.body);
+            setError("");
+        } catch (err) {
+            setError("Failed to fetch categories. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     async function handleDelete(categoryId) {
         try {
+            const token = cookies.jwtToken;
             await axios.delete(`http://localhost:8080/api/category/category/${categoryId}`, {
-                headers: { Authorization: `Bearer ${cookies.jwtToken}` },
+                headers: { Authorization: `Bearer ${token}` },
                 withCredentials: true
             });
 
             setCategoryData(categoryData.filter(category => category.categoryId !== categoryId));
         } catch (err) {
-            console.log("Error deleting category:", err.message);
+            alert("The category you are trying to delete is in use. Please remove the equipment associated with this category first.");
+            console.error("Error deleting category:", err);
         }
     }
 
     // Pagination Logic
-    const indexOfLastProduct = currentPage * productsPerPage;
-    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-    const currentProducts = categoryData.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(categoryData.length / categoriesPerPage);
+    const indexOfLastCategory = currentPage * categoriesPerPage;
+    const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage;
+    const currentCategories = categoryData.slice(indexOfFirstCategory, indexOfLastCategory);
 
     return (
-        <>
+        <div
+            className="container-fluid d-flex flex-column"
+            style={{
+                marginLeft: isSidebarOpen ? "250px" : "0px",
+                transition: "margin-left 0.3s ease-in-out",
+                height: "100vh",
+                overflow: "hidden",
+            }}
+        >
             {!showAddCategory ? (
                 <>
-                    {/* Top Navbar with Pagination and Add Button */}
-                    <div className="d-flex justify-content-between align-items-center bg-light p-3 mb-3 border rounded">
-    <button className="btn btn-primary ms-auto" onClick={() => setShowAddCategory(true)}>
-        Add Category
-    </button>
-</div>
+                    <h1 className="mb-4">Categories</h1>
 
+                    {/* Add Category Button */}
+                    <button
+                        className="btn btn-primary justify-content-center align-items-end ms-auto mb-2"
+                        style={{ right: "18px" }}
+                        onClick={() => setShowAddCategory(true)}
+                    >
+                        Add Category
+                    </button>
 
-                    {/* Category Table */}
-                    <div className="table-responsive">
-                        <table className="table table-bordered table-striped">
-                            <thead className="table-dark ">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Category Name</th>
-                                    <th>Description</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {currentProducts.map((category, index) => (
-                                    <tr key={category.categoryId}>
-                                        <td>{index + 1}</td>
-                                        <td>{category.name}</td>
-                                        <td style={{ wordWrap: "break-word", maxWidth: "300px", whiteSpace: "pre-line" }}>
-                                            {category.description}
-                                        </td>
-                                        <td>
-                                            <button className="btn btn-primary me-2">Edit</button>
-                                            <button className="btn btn-danger" onClick={() => handleDelete(category.categoryId)}>Delete</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    {/* Categories Table */}
+                    {loading ? (
+                        <p>Loading categories...</p>
+                    ) : error ? (
+                        <p className="text-danger">{error}</p>
+                    ) : (
+                        <div className="d-flex flex-column flex-grow-1">
+                            <div className="table-responsive flex-grow-1">
+                                <table className="table table-hover table-bordered table-striped">
+                                    <thead className="table-dark">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Category Name</th>
+                                            <th>Description</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {currentCategories.length > 0 ? (
+                                            currentCategories.map((category, index) => (
+                                                <tr key={category.categoryId}>
+                                                    <td>{index + 1 + (currentPage - 1) * categoriesPerPage}</td>
+                                                    <td>{category.name}</td>
+                                                    <td style={{ wordWrap: "break-word", maxWidth: "300px", whiteSpace: "pre-line" }}>
+                                                        {category.description}
+                                                    </td>
+                                                    <td>
+                                                        <button
+                                                            className="btn btn-primary me-2"
+                                                            onClick={() => {
+                                                                setSelectedCategory(category);
+                                                                setShowEditModal(true);
+                                                            }}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button className="btn btn-danger" onClick={() => handleDelete(category.categoryId)}>
+                                                            Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={4} className="text-center">
+                                                    No categories found.
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
 
-                    {/* Bottom Navbar with Pagination */}
-                    <div className="d-flex justify-content-center bg-light p-3 mt-3 border rounded">
-                        <Pagination data={categoryData} currentPage={currentPage} setCurrentPage={setCurrentPage}
-                            productsPerPage={productsPerPage} />
-                    </div>
+                            {/* Fixed Pagination at Bottom */}
+                            <Pagination data={categoryData} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={categoriesPerPage} />
+                        </div>
+                    )}
                 </>
             ) : (
                 <AddCategory setShowAddCategory={setShowAddCategory} />
             )}
-        </>
+
+            {/* Edit Category Modal */}
+            {showEditModal && <EditCategory category={selectedCategory} setShowEditModal={setShowEditModal} fetchCategories={fetchCategories} />}
+        </div>
     );
 }

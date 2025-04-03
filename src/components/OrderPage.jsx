@@ -12,7 +12,7 @@ const OrderPage = ({ isSidebarOpen }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const ordersPerPage = 7;
+  const ordersPerPage = 2;
 
   useEffect(() => {
     fetchOrders();

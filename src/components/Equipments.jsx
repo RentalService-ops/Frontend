@@ -14,7 +14,7 @@ export default function Equipments() {
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const productsPerPage = 6;
+    const productsPerPage = 7;
 
     // Modal States
     const [showDetailModal, setShowDetailModal] = useState(false);
@@ -93,146 +93,195 @@ export default function Equipments() {
         }
     };
 
+
+
     const handleSaveEdit = async () => {
-        const formData = new FormData();
-        formData.append("name", editedEquipment.name);
-        formData.append("pricePerDay", editedEquipment.pricePerDay);
-        formData.append("quantity", editedEquipment.quantity);
-        formData.append("description", editedEquipment.description);
-
-        if (editedEquipment.imageFile) {
-            formData.append("image", editedEquipment.imageFile);
+        if (!editedEquipment.equipmentId) {
+            alert("Equipment ID is missing.");
+            return;
         }
-
+    
+        const equipmentJson = JSON.stringify({
+            equipmentId: editedEquipment.equipmentId,
+            name: editedEquipment.name,
+            pricePerDay: editedEquipment.pricePerDay,
+            quantity: editedEquipment.quantity,
+            description: editedEquipment.description,
+        });
+    
+        const formDataToSend = new FormData();
+        formDataToSend.append("equipmentDTO", new Blob([equipmentJson], { type: "application/json" }));
+    
+        // Ensure imageFile is sent correctly
+        if (editedEquipment.imageFile) {
+            formDataToSend.append("imageFile", editedEquipment.imageFile);
+        }
+    
         try {
-            const response = await axios.put(`http://localhost:8080/api/equipment/update/${editedEquipment.equipmentId}`, formData, {
-                headers: {
-                    Authorization: `Bearer ${cookie.jwtToken}`,
-                    "Content-Type": "multipart/form-data"
-                },
-                withCredentials: true
-            });
-
-            setEquipmentData(equipmentData.map(equip => equip.equipmentId === response.data.equipmentId ? response.data : equip));
+            const response = await axios.patch(
+                "http://localhost:8080/api/equipment/editEquipment",
+                formDataToSend,
+                {
+                    headers: {
+                        Authorization: `Bearer ${cookie.jwtToken}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                    withCredentials: true,
+                }
+            );
+    
+            setEquipmentData(
+                equipmentData.map((equip) =>
+                    equip.equipmentId === response.data.equipmentId ? response.data : equip
+                )
+            );
             setShowEditModal(false);
         } catch (err) {
-            console.error("Error updating equipment:", err);
+            console.error("❌ Error updating equipment:", err);
+            alert(err.response?.data?.message || "Failed to update equipment.");
         }
     };
+    
+    
+    
 
     return (
-        <div>
+        <div className="d-flex flex-column" style={{ height: "100vh" }}>
             {!showAddEquipment ? (
                 <>
                     <div className="mb-3 d-flex justify-content-between">
                         <button className="btn btn-primary" onClick={() => setShowAddEquipment(true)}>Add Equipment</button>
-                        <Pagination data={equipmentData} currentPage={currentPage} setCurrentPage={setCurrentPage}
-                            productsPerPage={productsPerPage} />
                     </div>
-
-                    <div className="table-responsive">
-                        <table className="table table-bordered table-striped">
-                            <thead className="table-dark">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Image</th>
-                                    <th>Name</th>
-                                    <th>Price Per Day</th>
-                                    <th>Quantity</th>
-                                    <th>Description</th>
-                                    <th>Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {equipmentData.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage).map((equip, index) => (
-                                    <tr key={equip.equipmentId}>
-                                        <td>{index + 1}</td>
-                                        <td><img src={imageUrls[equip.imageUrl] || "/defaultImage.png"} alt="equipment" style={{ width: "50px", height: "50px" }} /></td>
-                                        <td>{equip.name}</td>
-                                        <td>${equip.pricePerDay}</td>
-                                        <td>{equip.quantity}</td>
-                                        <td>{equip.description}</td>
-                                        <td>
-                                            <button className="btn btn-info" onClick={() => { setSelectedEquipment(equip); setShowDetailModal(true); }}>View</button>
-                                        </td>
+    
+                    {/* Content Wrapper to Grow */}
+                    <div className="d-flex flex-column flex-grow-1">
+                        <div className="table-responsive flex-grow-1">
+                            <table className="table table-hover table-bordered table-striped">
+                                <thead className="table-dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Price Per Day</th>
+                                        <th>Quantity</th>
+                                        <th>Description</th>
+                                        <th>Details</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {equipmentData.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage).map((equip, index) => (
+                                        <tr key={equip.equipmentId}>
+                                            <td>{index + 1}</td>
+                                            <td><img src={imageUrls[equip.imageUrl] || "/defaultImage.png"} alt="equipment" style={{ width: "50px", height: "50px" }} /></td>
+                                            <td>{equip.name}</td>
+                                            <td>${equip.pricePerDay}</td>
+                                            <td>{equip.quantity}</td>
+                                            <td>{equip.description}</td>
+                                            <td>
+                                                <button className="btn btn-info" onClick={() => { setSelectedEquipment(equip); setShowDetailModal(true); }}>View</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+    
+                        {/* Fixed Pagination at Bottom */}
+                        <div className="d-flex justify-content-center mt-auto">
+                            <Pagination data={equipmentData} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={productsPerPage} />
+                        </div>
                     </div>
-
-                 {/* View Details Modal */}
-<Modal show={showDetailModal} onHide={() => setShowDetailModal(false)}>
-    <Modal.Header closeButton>
-        <Modal.Title>Equipment Details</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-        {selectedEquipment && (
-            <div className="row">
-                {/* Left Side - Equipment Details */}
-                <div className="col-md-7">
-                    <p><strong>Name:</strong> {selectedEquipment.name}</p>
-                    <p><strong>Price Per Day:</strong> ${selectedEquipment.pricePerDay}</p>
-                    <p><strong>Quantity:</strong> {selectedEquipment.quantity}</p>
-                    <p><strong>Description:</strong> {selectedEquipment.description}</p>
-                </div>
-                {/* Right Side - Image */}
-                <div className="col-md-5 text-center">
-                    <img src={imageUrls[selectedEquipment.imageUrl] || "/defaultImage.png"} 
-                         alt="equipment" className="img-fluid rounded shadow-sm" 
-                         style={{ maxWidth: "100%", maxHeight: "250px" }} />
-                </div>
-            </div>
-        )}
-    </Modal.Body>
-    <Modal.Footer>
-        <Button variant="warning" onClick={() => handleEdit(selectedEquipment)}>Edit</Button>
-        <Button variant="danger" onClick={() => handleDelete(selectedEquipment.equipmentId)}>Delete</Button>
-    </Modal.Footer>
-</Modal>
-
-
-                    {/* Add Edit Modal Below This */}
-                    <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+    
+                    {/* Modals */}
+                    {/* View Details Modal */}
+                    <Modal show={showDetailModal} onHide={() => setShowDetailModal(false)}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Edit Equipment</Modal.Title>
+                            <Modal.Title>Equipment Details</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            {editedEquipment && (
+                            {selectedEquipment && (
                                 <div className="row">
                                     <div className="col-md-7">
-                                        <label>Name</label>
-                                        <input type="text" className="form-control mb-2" value={editedEquipment.name}
-                                            onChange={(e) => setEditedEquipment({ ...editedEquipment, name: e.target.value })} />
-
-                                        <label>Price Per Day</label>
-                                        <input type="number" className="form-control mb-2" value={editedEquipment.pricePerDay}
-                                            onChange={(e) => setEditedEquipment({ ...editedEquipment, pricePerDay: e.target.value })} />
-
-                                        <label>Quantity</label>
-                                        <input type="number" className="form-control mb-2" value={editedEquipment.quantity}
-                                            onChange={(e) => setEditedEquipment({ ...editedEquipment, quantity: e.target.value })} />
-
-                                        <label>Description</label>
-                                        <textarea className="form-control" rows="3" value={editedEquipment.description}
-                                            onChange={(e) => setEditedEquipment({ ...editedEquipment, description: e.target.value })}></textarea>
+                                        <p><strong>Name:</strong> {selectedEquipment.name}</p>
+                                        <p><strong>Price Per Day:</strong> ${selectedEquipment.pricePerDay}</p>
+                                        <p><strong>Quantity:</strong> {selectedEquipment.quantity}</p>
+                                        <p><strong>Description:</strong> {selectedEquipment.description}</p>
                                     </div>
-                                    <div className="col-md-5">
-                                        <img src={editedEquipment.imagePreview} alt="equipment" className="img-fluid mb-2" />
-                                        <input type="file" className="form-control" onChange={handleImageChange} />
+                                    <div className="col-md-5 text-center">
+                                        <img src={imageUrls[selectedEquipment.imageUrl] || "/defaultImage.png"}
+                                            alt="equipment" className="img-fluid rounded shadow-sm"
+                                            style={{ maxWidth: "100%", maxHeight: "250px" }} />
                                     </div>
                                 </div>
                             )}
                         </Modal.Body>
                         <Modal.Footer>
+                            <Button variant="warning" onClick={() => handleEdit(selectedEquipment)}>Edit</Button>
+                            <Button variant="danger" onClick={() => handleDelete(selectedEquipment.equipmentId)}>Delete</Button>
+                        </Modal.Footer>
+                    </Modal>
+    
+                    {/* Edit Modal */}
+                    <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Edit Equipment</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                        {editedEquipment && (
+    <div className="row">
+        <div className="col-md-7">
+            {/* Hidden Input for Equipment ID */}
+            <input type="hidden" value={editedEquipment.equipmentId} />
+
+            <label>Name</label>
+            <input
+                type="text"
+                className="form-control mb-2"
+                value={editedEquipment.name}
+                onChange={(e) => setEditedEquipment({ ...editedEquipment, name: e.target.value })}
+            />
+
+            <label>Price Per Day</label>
+            <input
+                type="number"
+                className="form-control mb-2"
+                value={editedEquipment.pricePerDay}
+                onChange={(e) => setEditedEquipment({ ...editedEquipment, pricePerDay: e.target.value })}
+            />
+
+            <label>Quantity</label>
+            <input
+                type="number"
+                className="form-control mb-2"
+                value={editedEquipment.quantity}
+                onChange={(e) => setEditedEquipment({ ...editedEquipment, quantity: e.target.value })}
+            />
+
+            <label>Description</label>
+            <textarea
+                className="form-control"
+                rows="3"
+                value={editedEquipment.description}
+                onChange={(e) => setEditedEquipment({ ...editedEquipment, description: e.target.value })}
+            ></textarea>
+        </div>
+        <div className="col-md-5">
+            <img src={editedEquipment.imagePreview} alt="equipment" className="img-fluid mb-2" />
+            <input type="file" className="form-control" onChange={handleImageChange} />
+        </div>
+    </div>
+)}
+
+                        </Modal.Body>
+                        <Modal.Footer>
                             <Button variant="success" onClick={handleSaveEdit}>Save</Button>
                         </Modal.Footer>
                     </Modal>
-
                 </>
             ) : (
                 <AddEquipment setShowAddEquipment={setShowAddEquipment} />
             )}
         </div>
     );
+    
 }
