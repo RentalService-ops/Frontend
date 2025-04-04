@@ -1,25 +1,26 @@
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { Card, Button } from "react-bootstrap";
 import ProductModal from "./ProductModal";
-import Pagination from "./Pagination";
+import Pagination from "../layout/Pagination";
 
 const UserDashboard = ({ isSidebarOpen }) => {
   const [cookies] = useCookies(["jwtToken"]);
+
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("All Categories");
-  const [imageUrls, setImageUrls] = useState({});
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showModal, setShowModal] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState(products);
 
-  // Search State
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All Categories");
+
+  const [imageUrls, setImageUrls] = useState({});
+
+  const [showModal, setShowModal] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 6;
 
@@ -55,7 +56,6 @@ const UserDashboard = ({ isSidebarOpen }) => {
     fetchProducts();
   }, [cookies.jwtToken]);
 
-  // Fetch Images Function
   const fetchImages = async (data) => {
     const imageMap = {};
     await Promise.all(
@@ -86,63 +86,56 @@ const UserDashboard = ({ isSidebarOpen }) => {
 
   function handleFilter(category) {
     setSelectedCategory(category);
-    // Filter Products based on selected Category
     const newFilteredProducts =
       category === "All Categories"
         ? products
         : products.filter((product) => product.categoryName === category);
     setFilteredProducts(newFilteredProducts);
-    setCurrentPage(1); // Reset to first page when filtering
+    setCurrentPage(1);
   }
 
-  // Handle Search
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
-    // Filter Products based on search query
     const newFilteredProducts = products.filter(
       (product) =>
         product.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
         product.description.toLowerCase().includes(e.target.value.toLowerCase())
     );
     setFilteredProducts(newFilteredProducts);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1);
   };
 
-  // Pagination Logic
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
   return (
     <div
-      className="d-flex flex-column min-vh-100"
+      className="d-flex flex-column min-vh-100 bg-light"
       style={{
         marginLeft: isSidebarOpen ? "250px" : "0px",
         transition: "margin-left 0.3s ease-in-out",
       }}
     >
-      <div className="container-fluid flex-grow-1">
-        <h2 className="text-center mb-4">Rental Products</h2>
+      <div className="container-fluid p-4">
+       
 
-        {/* Filters Row */}
-        <div className="d-flex justify-content-between mb-3">
-          {/* Search Bar */}
-          <div className="w-50">
-            <h4>Search Products:</h4>
+        {/* Filters */}
+        <div className="d-flex justify-content-between mb-4">
+          <div className="w-50 pe-3">
+            <h5 className="text-info"> Search Products</h5>
             <input
               type="text"
-              className="form-control"
+              className="form-control border border-primary shadow-sm"
               placeholder="Search by name or description"
               value={searchQuery}
               onChange={handleSearch}
             />
           </div>
-
-          {/* Category Filter Dropdown */}
           <div className="w-45">
-            <h4>Filter by Category:</h4>
+            <h5 className="text-success"> Filter by Category</h5>
             <select
-              className="form-select"
+              className="form-select border border-success shadow-sm"
               onChange={(e) => handleFilter(e.target.value)}
               value={selectedCategory}
             >
@@ -157,10 +150,10 @@ const UserDashboard = ({ isSidebarOpen }) => {
         </div>
 
         {/* Product Grid */}
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-3">
+        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
           {currentProducts.map((product) => (
             <div className="col" key={product.equipmentId}>
-              <Card className="shadow border-0 h-100" onClick={() => handleProductClick(product)}>
+              <Card className="h-100 shadow-sm product-card">
                 <Card.Img
                   variant="top"
                   src={imageUrls[product.imageUrl] || "/defaultImage.png"}
@@ -170,24 +163,42 @@ const UserDashboard = ({ isSidebarOpen }) => {
                 <Card.Body>
                   <Card.Title>{product.name}</Card.Title>
                   <Card.Text>{product.description}</Card.Text>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <Button variant="primary">Rent Now</Button>
-                    <small className="text-muted">₹{product.pricePerDay}/day</small>
+
+                  {/* Quantity Display */}
+                  {product.quantity > 0 ? (
+                    <span className="badge bg-success mb-2">In stock: {product.quantity}</span>
+                  ) : (
+                    <span className="badge bg-danger mb-2">Not in stock</span>
+                  )}
+
+                  <div className="d-flex justify-content-between align-items-center mt-2">
+                    <Button
+                      variant="primary"
+                      disabled={product.quantity === 0}
+                      onClick={() => handleProductClick(product)}
+                    >
+                      Rent Now
+                    </Button>
+                    <span className="badge bg-warning text-dark">₹{product.pricePerDay}/day</span>
                   </div>
                 </Card.Body>
-                <Card.Footer>
-                  <small className="text-muted">
-                    Category: {product.categoryName || "Uncategorized"}
-                  </small>
+                <Card.Footer className="d-flex justify-content-between align-items-center bg-gradient">
+                  <span className="badge bg-light text-dark">
+                    {product.categoryName || "Uncategorized"}
+                  </span>
                 </Card.Footer>
               </Card>
             </div>
           ))}
         </div>
 
-        <Pagination data={filteredProducts} currentPage={currentPage} setCurrentPage={setCurrentPage}
-        productsPerPage={productsPerPage}/>
-
+        {/* Pagination */}
+        <Pagination
+          data={filteredProducts}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          productsPerPage={productsPerPage}
+        />
       </div>
 
       {selectedProduct && (

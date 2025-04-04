@@ -1,7 +1,6 @@
 export default function Pagination({data,currentPage,setCurrentPage,productsPerPage}){
     const length= data?.length || 0;
     const totalPages = Math.ceil(length / productsPerPage);
-    console.log(totalPages)
     return(
         <> 
            {totalPages > 1 && (

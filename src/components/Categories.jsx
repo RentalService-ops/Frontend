@@ -4,7 +4,7 @@ import EditCategory from "./EditCategory";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import Pagination from "./Pagination";
+import Pagination from "../layout/Pagination";
 
 export default function Categories({ isSidebarOpen }) {
     const [showAddCategory, setShowAddCategory] = useState(false);

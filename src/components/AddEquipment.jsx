@@ -190,8 +190,8 @@ export default function AddEquipment({setShowAddEquipment}) {
                     />
                     {imageSrc && (
                         <>
-                            <h3>Uploaded file:</h3>
-                            <img src={imageSrc} alt="Uploaded" style={{ maxWidth: "100%", height: "auto" }} />
+                            <h4>Uploaded file:</h4>
+                            <img src={imageSrc} alt="Uploaded" style={{ maxWidth: "50%", height: "15vh" }} />
                         </>
                     )}
                 </div>

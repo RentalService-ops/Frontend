@@ -11,7 +11,7 @@ const OrderCard = ({ order, onConfirmCancel }) => {
             <strong>Quantity:</strong> {order.equipmentQuantity}
           </Card.Text>
           <Card.Text>
-            <strong>Total Price:</strong> ₹{order.totalAmount}
+            <strong>Total Price:</strong> ₹{order.totalAmount }
           </Card.Text>
           <Card.Text>
             <strong>Status:</strong> {order.status}

@@ -3,7 +3,7 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 import AddEquipment from "./AddEquipment";
-import Pagination from "./Pagination";
+import Pagination from "../layout/Pagination";
 import { Modal, Button } from "react-bootstrap";
 
 export default function Equipments() {

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import Pagination from "../layout/Pagination";
 
 const OrderPage = ({ isSidebarOpen }) => {
   const [cookies] = useCookies(["jwtToken"]);
@@ -59,8 +60,6 @@ const OrderPage = ({ isSidebarOpen }) => {
           withCredentials: true,
         }
       );
-
-      // Refresh orders after cancellation
       fetchOrders();
     } catch (error) {
       console.error("Error canceling order:", error);
@@ -104,7 +103,6 @@ const OrderPage = ({ isSidebarOpen }) => {
   const filteredOrders =
     activeTab === "ALL" ? orders : orders.filter((order) => order.status === activeTab);
 
-  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
@@ -112,25 +110,28 @@ const OrderPage = ({ isSidebarOpen }) => {
   return (
     <>
       <div
-        className="container-fluid d-flex flex-column"
+        className="container-fluid d-flex flex-column bg-light"
         style={{
           marginLeft: isSidebarOpen ? "250px" : "0px",
           transition: "margin-left 0.3s ease-in-out",
           height: "100vh",
           overflow: "auto",
+          padding: "20px",
         }}
       >
-        <h1 className="mb-4">My Orders</h1>
-
-        {/* Filter Buttons */}
-        <div className="card mb-4">
+        <h2 className="mb-4 fw-bold text-primary"> My Orders</h2>
+  
+        {/* Filter */}
+        <div className="card shadow-sm mb-4 border-0">
           <div className="card-body">
-            <h5 className="card-title">Filter Orders</h5>
+            <h5 className="card-title text-secondary">Filter Orders</h5>
             <div className="d-flex flex-wrap gap-2">
               {["ALL", ...bookingStatuses].map((status) => (
                 <button
                   key={status}
-                  className={`btn ${activeTab === status ? "btn-primary" : "btn-outline-primary"}`}
+                  className={`btn ${
+                    activeTab === status ? "btn-primary" : "btn-outline-primary"
+                  } rounded-pill px-3 py-1`}
                   onClick={() => setActiveTab(status)}
                 >
                   {status}
@@ -139,17 +140,17 @@ const OrderPage = ({ isSidebarOpen }) => {
             </div>
           </div>
         </div>
-
-        {/* Orders Table */}
+  
+        {/* Table or Loading/Error */}
         {loading ? (
-          <p>Loading orders...</p>
+          <p className="text-muted">⏳ Loading orders...</p>
         ) : error ? (
           <p className="text-danger">{error}</p>
         ) : (
           <div className="d-flex flex-column flex-grow-1">
             <div className="table-responsive flex-grow-1">
-              <table className="table table-hover">
-                <thead>
+              <table className="table table-hover table-bordered rounded shadow-sm">
+                <thead className="table-primary">
                   <tr>
                     <th>Equipment Name</th>
                     <th>Rental Period</th>
@@ -176,32 +177,20 @@ const OrderPage = ({ isSidebarOpen }) => {
                             {order.status}
                           </span>
                         </td>
-                        {/* <td>
-                          {order.status === "PENDING" && (
-                            <button
-                              className="btn btn-danger btn-sm"
-                              onClick={() => handleCancelClick(order.bookingId)}
-                            >
-                              Cancel
-                            </button>
-                          )}
-                        </td> */}
-
                         <td>
                           <button
-                            className="btn btn-danger btn-sm"
+                            className="btn btn-danger btn-sm rounded-pill"
                             onClick={() => handleCancelClick(order.bookingId)}
                             disabled={order.status !== "PENDING"}
                           >
                             Cancel
                           </button>
                         </td>
-
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={7} className="text-center">
+                      <td colSpan={7} className="text-center text-muted py-3">
                         No orders found.
                       </td>
                     </tr>
@@ -209,55 +198,59 @@ const OrderPage = ({ isSidebarOpen }) => {
                 </tbody>
               </table>
             </div>
-
+  
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="d-flex justify-content-center align-items-center py-3">
-                <button
-                  className="btn btn-outline-primary me-2"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                >
-                  Previous
-                </button>
-                <span>
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  className="btn btn-outline-primary ms-2"
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                >
-                  Next
-                </button>
-              </div>
-            )}
+            <div className="d-flex justify-content-center mt-auto">
+                                        <Pagination data={filteredOrders} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={ordersPerPage} />
+                                    </div>
           </div>
         )}
       </div>
-
-      {/* Confirmation Modal */}
+  
+      {/* Modal */}
       {showModal && (
-        <div className="modal d-block" tabIndex="-1">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Cancel Order</h5>
-                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
-              </div>
-              <div className="modal-body">
-                <p>Are you sure you want to cancel this order?</p>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Close</button>
-                <button className="btn btn-danger" onClick={cancelOrder}>Cancel Order</button>
+        <>
+          <div
+            className="modal fade show d-block"
+            tabIndex="-1"
+            style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          >
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content shadow-lg">
+                <div className="modal-header bg-danger text-white">
+                  <h5 className="modal-title">Cancel Order</h5>
+                  <button
+                    type="button"
+                    className="btn-close btn-close-white"
+                    onClick={() => setShowModal(false)}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <p>Are you sure you want to cancel this order?</p>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    className="btn btn-secondary rounded-pill"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Close
+                  </button>
+                  <button
+                    className="btn btn-danger rounded-pill"
+                    onClick={cancelOrder}
+                  >
+                    Yes, Cancel
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+          <div className="modal-backdrop fade show"></div>
+        </>
       )}
     </>
   );
+  
 };
 
 export default OrderPage;

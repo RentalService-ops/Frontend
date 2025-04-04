@@ -4,44 +4,58 @@ import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
 
 const ProductModal = ({ product, show, onClose }) => {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [totalDays, setTotalDays] = useState(0);
-  const [totalCost, setTotalCost] = useState(0);
-  const [quantity, setQuantity] = useState(1);
+  const [rentalData, setRentalData] = useState({
+    startDate: "",
+    endDate: "",
+    totalDays: 0,
+    totalCost: 0,
+    quantity: 1,
+    selectedAddress: "",
+  });
+
   const [addresses, setAddresses] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState("");
   const [cookie] = useCookies(["jwtToken"]);
 
   useEffect(() => {
     if (show) {
-      document.body.style.overflow = "hidden"; // Prevent background scrolling
+      document.body.style.overflow = "hidden";
       fetchUserAddresses();
     } else {
-      document.body.style.overflow = "auto"; // Restore scrolling
+      document.body.style.overflow = "auto";
     }
     return () => {
-      document.body.style.overflow = "auto"; // Cleanup when modal unmounts
+      document.body.style.overflow = "auto";
     };
   }, [show, cookie.jwtToken]);
 
   useEffect(() => {
+    const { startDate, endDate, quantity } = rentalData;
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       if (start > end) {
-        setTotalDays(0);
-        setTotalCost(0);
+        setRentalData((prev) => ({
+          ...prev,
+          totalDays: 0,
+          totalCost: 0,
+        }));
         return;
       }
       const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-      setTotalDays(diffDays);
-      setTotalCost(diffDays * (product?.pricePerDay || 0) * quantity);
+      const cost = diffDays * (product?.pricePerDay || 0) * quantity;
+      setRentalData((prev) => ({
+        ...prev,
+        totalDays: diffDays,
+        totalCost: cost,
+      }));
     } else {
-      setTotalDays(0);
-      setTotalCost(0);
+      setRentalData((prev) => ({
+        ...prev,
+        totalDays: 0,
+        totalCost: 0,
+      }));
     }
-  }, [startDate, endDate, quantity, product]);
+  }, [rentalData.startDate, rentalData.endDate, rentalData.quantity, product]);
 
   const fetchUserAddresses = async () => {
     try {
@@ -55,13 +69,20 @@ const ProductModal = ({ product, show, onClose }) => {
         }
       );
       setAddresses(response.data);
-      if (response.data.length > 0) setSelectedAddress(response.data[0].id);
+      if (response.data.length > 0) {
+        setRentalData((prev) => ({
+          ...prev,
+          selectedAddress: response.data[0].id,
+        }));
+      }
     } catch (error) {
       console.error("Error fetching addresses:", error);
     }
   };
 
   const handleRentNow = async () => {
+    const { startDate, endDate, selectedAddress, quantity, totalCost } = rentalData;
+
     if (!startDate || !endDate || !selectedAddress) {
       alert("Please select start date, end date, and address.");
       return;
@@ -98,17 +119,28 @@ const ProductModal = ({ product, show, onClose }) => {
     }
   };
 
+  function handleClose() {
+    setRentalData({
+      startDate: "",
+      endDate: "",
+      totalDays: 0,
+      totalCost: 0,
+      quantity: 1,
+      selectedAddress: "",
+    });
+    onClose();
+  }
+
   return (
-    <div className={`modal fade ${show ? "show d-block" : "d-none"}`} tabIndex="-1">
+    <div className={`modal fade ${show ? "show d-block" : "d-none"}`} style={{background:"rgba(0, 0, 0, 0.5)"}} >
       <div className="modal-dialog modal-lg">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">{product?.name || "Product Name"}</h5>
-            <button type="button" className="btn-close" onClick={onClose}></button>
+            <button type="button" className="btn-close" onClick={handleClose}></button>
           </div>
           <div className="modal-body">
             <div className="row align-items-center">
-              {/* Left Side: Image */}
               <div className="col-md-5 text-center">
                 <img
                   src={product?.image || "/defaultImage.png"}
@@ -118,7 +150,6 @@ const ProductModal = ({ product, show, onClose }) => {
                 />
               </div>
 
-              {/* Right Side: Details */}
               <div className="col-md-7">
                 <h6>Rental Details:</h6>
                 <form onSubmit={(e) => e.preventDefault()}>
@@ -128,8 +159,8 @@ const ProductModal = ({ product, show, onClose }) => {
                       type="date"
                       className="form-control"
                       id="startDate"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
+                      value={rentalData.startDate}
+                      onChange={(e) => setRentalData({ ...rentalData, startDate: e.target.value })}
                       min={new Date().toISOString().split("T")[0]}
                       required
                     />
@@ -140,9 +171,9 @@ const ProductModal = ({ product, show, onClose }) => {
                       type="date"
                       className="form-control"
                       id="endDate"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      min={startDate || new Date().toISOString().split("T")[0]}
+                      value={rentalData.endDate}
+                      onChange={(e) => setRentalData({ ...rentalData, endDate: e.target.value })}
+                      min={rentalData.startDate || new Date().toISOString().split("T")[0]}
                       required
                     />
                   </div>
@@ -152,8 +183,13 @@ const ProductModal = ({ product, show, onClose }) => {
                       type="number"
                       className="form-control"
                       id="quantity"
-                      value={quantity}
-                      onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                      value={rentalData.quantity}
+                      onChange={(e) =>
+                        setRentalData({
+                          ...rentalData,
+                          quantity: Math.max(1, parseInt(e.target.value) || 1),
+                        })
+                      }
                       min="1"
                       required
                     />
@@ -163,8 +199,10 @@ const ProductModal = ({ product, show, onClose }) => {
                     <select
                       className="form-select"
                       id="address"
-                      value={selectedAddress}
-                      onChange={(e) => setSelectedAddress(e.target.value)}
+                      value={rentalData.selectedAddress}
+                      onChange={(e) =>
+                        setRentalData({ ...rentalData, selectedAddress: e.target.value })
+                      }
                       required
                     >
                       {addresses.length === 0 ? (
@@ -179,10 +217,9 @@ const ProductModal = ({ product, show, onClose }) => {
                     </select>
                   </div>
 
-                  {/* Total Cost Row */}
                   <div className="alert alert-info d-flex justify-content-between">
-                    <strong>Total Days: {totalDays}</strong>
-                    <strong>Total Cost: ₹{totalCost.toFixed(2)}</strong>
+                    <strong>Total Days: {rentalData.totalDays}</strong>
+                    <strong>Total Cost: ₹{rentalData.totalCost.toFixed(2)}</strong>
                   </div>
 
                   <button type="button" className="btn btn-primary w-100" onClick={handleRentNow}>
