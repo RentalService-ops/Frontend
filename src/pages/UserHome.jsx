@@ -6,7 +6,7 @@ import { IoAddCircleOutline } from "react-icons/io5";
 import Sidebar from "../layout/SideBar";
 
 export default function UserHome({isSidebarOpen}) {
-  const [activeLink, setActiveLink] = useState("Home");
+  const [activeLink, setActiveLink] = useState(localStorage.getItem("state") || "Home");
 
   const renderComponent = () => {
     switch (activeLink) {

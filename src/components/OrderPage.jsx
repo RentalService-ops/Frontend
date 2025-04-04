@@ -3,7 +3,7 @@ import { useCookies } from "react-cookie";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import Pagination from "../layout/Pagination";
-
+import Table from "./Table"
 const OrderPage = ({ isSidebarOpen }) => {
   const [cookies] = useCookies(["jwtToken"]);
   const [orders, setOrders] = useState([]);
@@ -14,6 +14,45 @@ const OrderPage = ({ isSidebarOpen }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const ordersPerPage = 6;
+
+  const config=[
+    {
+      label:"Equipment Name",
+      render:(order)=>order.equipmentName
+    },
+    {
+      label:"Rental Period",
+      render:(order)=>(<>{order.startDate} to {order.endDate}</>)
+    },
+    {
+      label:"Total Days",
+      render:(order)=>calculateTotalDays(order.startDate,order.endDate)
+    },
+    {
+      label:"Quantity",
+      render:(order)=>order.equipmentQuantity
+    },
+    {
+      label:"Total Cost",
+      render:(order)=>order.totalAmount.toFixed(2)
+    },
+    {
+      label:"Status",
+      render:(order)=>( <span className={getStatusBadgeClass(order.status)}>
+      {order.status}
+    </span>)
+    },
+    {
+      label:"Action",
+      render:(order)=>(<button
+        className="btn btn-danger btn-sm rounded-pill"
+        onClick={() => handleCancelClick(order.bookingId)}
+        disabled={order.status !== "PENDING"}
+      >
+        Cancel
+      </button>)
+    }
+  ]
 
   useEffect(() => {
     fetchOrders();
@@ -148,61 +187,12 @@ const OrderPage = ({ isSidebarOpen }) => {
           <p className="text-danger">{error}</p>
         ) : (
           <div className="d-flex flex-column flex-grow-1">
-            <div className="table-responsive flex-grow-1">
-              <table className="table table-hover table-bordered rounded shadow-sm">
-                <thead className="table-primary">
-                  <tr>
-                    <th>Equipment Name</th>
-                    <th>Rental Period</th>
-                    <th>Total Days</th>
-                    <th>Quantity</th>
-                    <th>Total Cost</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentOrders.length > 0 ? (
-                    currentOrders.map((order, index) => (
-                      <tr key={index}>
-                        <td>{order.equipmentName}</td>
-                        <td>
-                          {order.startDate} to {order.endDate}
-                        </td>
-                        <td>{calculateTotalDays(order.startDate, order.endDate)}</td>
-                        <td>{order.equipmentQuantity}</td>
-                        <td>₹{order.totalAmount.toFixed(2)}</td>
-                        <td>
-                          <span className={getStatusBadgeClass(order.status)}>
-                            {order.status}
-                          </span>
-                        </td>
-                        <td>
-                          <button
-                            className="btn btn-danger btn-sm rounded-pill"
-                            onClick={() => handleCancelClick(order.bookingId)}
-                            disabled={order.status !== "PENDING"}
-                          >
-                            Cancel
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={7} className="text-center text-muted py-3">
-                        No orders found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <Table config={config} bookings={currentOrders} keyFn={(booking)=>booking.bookingId} />
   
             {/* Pagination */}
             <div className="d-flex justify-content-center mt-auto">
-                                        <Pagination data={filteredOrders} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={ordersPerPage} />
-                                    </div>
+              <Pagination data={filteredOrders} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={ordersPerPage} />
+            </div>
           </div>
         )}
       </div>

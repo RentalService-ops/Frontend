@@ -41,7 +41,7 @@ export default function RentalDashboard() {
     { label: "Quantity", render: (booking) => booking.equipmentQuantity },
     { label: "From", render: (booking) => booking.startDate },
     { label: "To", render: (booking) => booking.endDate },
-    { label: "Amount", render: (booking) => `$${booking.totalAmount}` },
+    { label: "Amount", render: (booking) => `₹${booking.totalAmount}` },
     { label: "Status", render: (booking) => <span className={`badge ${booking.status === "APPROVED" ? "bg-success" : booking.status === "REJECTED" ? "bg-danger" : "bg-warning"}`}>{booking.status}</span> },
     {
       label: "Actions",

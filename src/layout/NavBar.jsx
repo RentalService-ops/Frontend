@@ -9,6 +9,7 @@ const Navbar = ({ toggleSidebar }) => {
   function handleLogOut() {
     removeCookie("jwtToken", { path: "/" });
     removeCookie("role", { path: "/" });
+    localStorage.removeItem("state");
     navigate("/");
     window.location.reload();
   }

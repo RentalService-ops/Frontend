@@ -5,7 +5,8 @@ import { jwtDecode } from "jwt-decode";
 import AddEquipment from "./AddEquipment";
 import Pagination from "../layout/Pagination";
 import { Modal, Button } from "react-bootstrap";
-
+import EditEquipmentForm from "./EditEquipmentForm";
+import Table from "./Table"
 export default function Equipments() {
     const [cookie] = useCookies();
     const [equipmentData, setEquipmentData] = useState([]);
@@ -20,7 +21,37 @@ export default function Equipments() {
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedEquipment, setSelectedEquipment] = useState(null);
-    const [editedEquipment, setEditedEquipment] = useState(null);
+
+    const tableData = [
+        {
+            label: "#",
+            render: (index) => index + 1
+        },
+        {
+            label: "Image",
+            render: (equipment) => (<img src={imageUrls[equipment.imageUrl] || "/defaultImage.png"} alt="equipment" style={{ width: "50px", height: "50px" }} />)
+        },
+        {
+            label: "Name",
+            render: (equipment) => equipment.name
+        },
+        {
+            label: "Price Per Day",
+            render: (equipment) => equipment.pricePerDay
+        },
+        {
+            label: "Quantity",
+            render: (equipment) => equipment.quantity
+        },
+        {
+            label: "Description",
+            render: (equipment) => equipment.description
+        },
+        {
+            label: "Details",
+            render: (equipment) => (<button className="btn btn-info" onClick={() => { setSelectedEquipment(equipment); setShowDetailModal(true); }}>View</button>)
+        },
+    ]
 
     useEffect(() => {
         async function fetchEquipmentData() {
@@ -76,31 +107,17 @@ export default function Equipments() {
         }
     };
 
-    const handleEdit = (equipment) => {
-        setEditedEquipment({ ...equipment, imagePreview: imageUrls[equipment.imageUrl] || "/defaultImage.png" });
+    const handleEdit = () => {
         setShowDetailModal(false);
         setShowEditModal(true);
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setEditedEquipment({ ...editedEquipment, imagePreview: reader.result, imageFile: file });
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-
-
-    const handleSaveEdit = async () => {
+    const handleSaveEdit = async (editedEquipment) => {
         if (!editedEquipment.equipmentId) {
             alert("Equipment ID is missing.");
             return;
         }
-    
+
         const equipmentJson = JSON.stringify({
             equipmentId: editedEquipment.equipmentId,
             name: editedEquipment.name,
@@ -108,15 +125,15 @@ export default function Equipments() {
             quantity: editedEquipment.quantity,
             description: editedEquipment.description,
         });
-    
+
         const formDataToSend = new FormData();
         formDataToSend.append("equipmentDTO", new Blob([equipmentJson], { type: "application/json" }));
-    
+
         // Ensure imageFile is sent correctly
         if (editedEquipment.imageFile) {
             formDataToSend.append("imageFile", editedEquipment.imageFile);
         }
-    
+
         try {
             const response = await axios.patch(
                 "http://localhost:8080/api/equipment/editEquipment",
@@ -129,7 +146,7 @@ export default function Equipments() {
                     withCredentials: true,
                 }
             );
-    
+
             setEquipmentData(
                 equipmentData.map((equip) =>
                     equip.equipmentId === response.data.equipmentId ? response.data : equip
@@ -141,9 +158,6 @@ export default function Equipments() {
             alert(err.response?.data?.message || "Failed to update equipment.");
         }
     };
-    
-    
-    
 
     return (
         <div className="d-flex flex-column" style={{ height: "100vh" }}>
@@ -152,46 +166,15 @@ export default function Equipments() {
                     <div className="mb-3 d-flex justify-content-between">
                         <button className="btn btn-primary" onClick={() => setShowAddEquipment(true)}>Add Equipment</button>
                     </div>
-    
-                    {/* Content Wrapper to Grow */}
+
                     <div className="d-flex flex-column flex-grow-1">
-                        <div className="table-responsive flex-grow-1">
-                            <table className="table table-hover table-bordered table-striped">
-                                <thead className="table-dark">
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Image</th>
-                                        <th>Name</th>
-                                        <th>Price Per Day</th>
-                                        <th>Quantity</th>
-                                        <th>Description</th>
-                                        <th>Details</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {equipmentData.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage).map((equip, index) => (
-                                        <tr key={equip.equipmentId}>
-                                            <td>{index + 1}</td>
-                                            <td><img src={imageUrls[equip.imageUrl] || "/defaultImage.png"} alt="equipment" style={{ width: "50px", height: "50px" }} /></td>
-                                            <td>{equip.name}</td>
-                                            <td>${equip.pricePerDay}</td>
-                                            <td>{equip.quantity}</td>
-                                            <td>{equip.description}</td>
-                                            <td>
-                                                <button className="btn btn-info" onClick={() => { setSelectedEquipment(equip); setShowDetailModal(true); }}>View</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-    
+                        <Table config={tableData} bookings={equipmentData.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)} keyFn={(equipment) => equipment.equipmentId} />
                         {/* Fixed Pagination at Bottom */}
                         <div className="d-flex justify-content-center mt-auto">
                             <Pagination data={equipmentData} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={productsPerPage} />
                         </div>
                     </div>
-    
+
                     {/* Modals */}
                     {/* View Details Modal */}
                     <Modal show={showDetailModal} onHide={() => setShowDetailModal(false)}>
@@ -220,68 +203,13 @@ export default function Equipments() {
                             <Button variant="danger" onClick={() => handleDelete(selectedEquipment.equipmentId)}>Delete</Button>
                         </Modal.Footer>
                     </Modal>
-    
-                    {/* Edit Modal */}
-                    <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Edit Equipment</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                        {editedEquipment && (
-    <div className="row">
-        <div className="col-md-7">
-            {/* Hidden Input for Equipment ID */}
-            <input type="hidden" value={editedEquipment.equipmentId} />
 
-            <label>Name</label>
-            <input
-                type="text"
-                className="form-control mb-2"
-                value={editedEquipment.name}
-                onChange={(e) => setEditedEquipment({ ...editedEquipment, name: e.target.value })}
-            />
-
-            <label>Price Per Day</label>
-            <input
-                type="number"
-                className="form-control mb-2"
-                value={editedEquipment.pricePerDay}
-                onChange={(e) => setEditedEquipment({ ...editedEquipment, pricePerDay: e.target.value })}
-            />
-
-            <label>Quantity</label>
-            <input
-                type="number"
-                className="form-control mb-2"
-                value={editedEquipment.quantity}
-                onChange={(e) => setEditedEquipment({ ...editedEquipment, quantity: e.target.value })}
-            />
-
-            <label>Description</label>
-            <textarea
-                className="form-control"
-                rows="3"
-                value={editedEquipment.description}
-                onChange={(e) => setEditedEquipment({ ...editedEquipment, description: e.target.value })}
-            ></textarea>
-        </div>
-        <div className="col-md-5">
-            <img src={editedEquipment.imagePreview} alt="equipment" className="img-fluid mb-2" />
-            <input type="file" className="form-control" onChange={handleImageChange} />
-        </div>
-    </div>
-)}
-
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="success" onClick={handleSaveEdit}>Save</Button>
-                        </Modal.Footer>
-                    </Modal>
+                    <EditEquipmentForm equipment={{ ...selectedEquipment, imagePreview: imageUrls[selectedEquipment?.imageUrl] || "/defaultImage.png" }} showEditModal={showEditModal} handleSaveEdit={handleSaveEdit} setShowEditModal={setShowEditModal}/>
                 </>
             ) : (
                 <AddEquipment setShowAddEquipment={setShowAddEquipment} />
             )}
         </div>
     );
-    
+
 }

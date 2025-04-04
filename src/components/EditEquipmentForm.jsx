@@ -1,73 +1,78 @@
-import ReactDOM from "react-dom"
-import axios from "axios"
-import { useState } from "react";
-import { useCookies } from "react-cookie";
-function EditEquipmentForm({ notShow, values, handleAfterEdit }) { //to add functionality to change image also
-  const [cookie] = useCookies()
-  const [formData, setFormData] = useState({
-    name: values.name,
-    description: values.description,
-    imageUrl: values.imageUrl,
-    quantity: values.quantity,
-    pricePerDay: values.pricePerDay
-  });
+import { Modal, Button } from "react-bootstrap";
+import {useEffect, useState} from "react"
+export default function EditEquipmentForm({showEditModal,handleSaveEdit,equipment,setShowEditModal}) {
+  const [editedEquipment, setEditedEquipment] = useState({});
 
-  async function handleClick() {
-    console.log(formData)
-    for (let keys in formData) {
-      if(keys!== "imageUrl"   &&  !formData[keys] ) {
-        alert("Please enter all the details!!");
-        return;
-      }
+  useEffect(()=>{
+    setEditedEquipment(equipment);
+  },[])
+  
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setEditedEquipment({ ...editedEquipment, imagePreview: reader.result, imageFile: file });
+        };
+        reader.readAsDataURL(file);
     }
-    console.log(formData)
-    console.log(values.equipmentId)
-    try {
-      await axios.patch("http://localhost:8080/api/equipment/editEquipment", {...formData,equipmentId:values.equipmentId}, {
-        headers: {
-          Authorization: `Bearer ${cookie.jwtToken}`
-        }
-        , withCredentials: true
-      })
-      handleAfterEdit({...formData,equipmentId:values.equipmentId})
-    }
-    catch (err) {
-      console.log(err.message);
-    }
-    finally {
-      setFormData({})
-      notShow(false);
-    }
-  }
+};
 
-  function handleChange(event) {
-    const name = event.target.name;
-    const value = event.target.value;
-    setFormData({ ...formData, [name]: value })
-  }
+  return (
+    <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+      <Modal.Header closeButton>
+        <Modal.Title>Edit Equipment</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        {editedEquipment && (
+          <div className="row">
+            <div className="col-md-7">
+              {/* Hidden Input for Equipment ID */}
+              <input type="hidden" value={editedEquipment.equipmentId} />
 
-  return ReactDOM.createPortal(
-    <div>
-      <div className="position-fixed top-0 bottom-0 end-0 start-0 bg-secondary opacity-75" style={{ zIndex: 1050 }}></div>
-      <div className="position-fixed top-50 start-50 translate-middle bg-white login-container" style={{ zIndex: 1060, height: "fit-content" }}>
-        <h1>Edit Equipment Details : </h1>
-        <label>Name: </label>
-        <input type="text" name="name" className="form-control mb-3" value={formData.name} onChange={handleChange} />
-        <label>Quantity:</label>
-        <input type="number" name="quantity" className="form-control mb-3" value={formData.quantity} onChange={handleChange} />
-        <label>Price Per Day:</label>
-        <input type="number" name="pricePerDay" className="form-control mb-3" value={formData.pricePerDay} onChange={handleChange} />
-        <label>Description</label>
-        <textarea name="description" className="form-control mb-3" id="exampleFormControlTextarea1" rows="3" required={true} onChange={handleChange} value={formData.description}></textarea>
-        <div className="d-flex justify-content-between">
-          <button className="btn btn-primary" onClick={handleClick}>Edit Details</button>
-          <button className="btn btn-primary" onClick={() => notShow(false)}>Go back</button>
-        </div>
-      </div>
-    </div>,
-    document.querySelector(".modal-container")
+              <label>Name</label>
+              <input
+                type="text"
+                className="form-control mb-2"
+                value={editedEquipment.name}
+                onChange={(e) => setEditedEquipment({ ...editedEquipment, name: e.target.value })}
+              />
+
+              <label>Price Per Day</label>
+              <input
+                type="number"
+                className="form-control mb-2"
+                value={editedEquipment.pricePerDay}
+                onChange={(e) => setEditedEquipment({ ...editedEquipment, pricePerDay: e.target.value })}
+              />
+
+              <label>Quantity</label>
+              <input
+                type="number"
+                className="form-control mb-2"
+                value={editedEquipment.quantity}
+                onChange={(e) => setEditedEquipment({ ...editedEquipment, quantity: e.target.value })}
+              />
+
+              <label>Description</label>
+              <textarea
+                className="form-control"
+                rows="3"
+                value={editedEquipment.description}
+                onChange={(e) => setEditedEquipment({ ...editedEquipment, description: e.target.value })}
+              ></textarea>
+            </div>
+            <div className="col-md-5">
+              <img src={editedEquipment.imagePreview} alt="equipment" className="img-fluid mb-2" />
+              <input type="file" className="form-control" onChange={handleImageChange} />
+            </div>
+          </div>
+        )}
+
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="success" onClick={()=>handleSaveEdit(editedEquipment)}>Save</Button>
+      </Modal.Footer>
+    </Modal>
   )
-
 }
-
-export default EditEquipmentForm;

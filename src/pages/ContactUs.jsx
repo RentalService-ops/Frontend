@@ -9,7 +9,7 @@ export default function ContactUs() {
 
     async function handleSubmit(){
         try{
-            await axios.post("http://localhost:8080/contact",queryData,{withCredentials:true})
+            await axios.post("http://localhost:8080/api/user/contact",queryData)
             alert("your query is posted. We will resolve it soon.")
             setQueryData({
                 username:"",

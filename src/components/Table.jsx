@@ -1,6 +1,6 @@
 export default function Table({ bookings, config, keyFn }) {
     return (
-        <div className="table-responsive">
+        <div className="table-responsive flex-grow-1">
             <table className="table table-striped table-bordered table-hover">
                 <thead className="table-dark">
                     <tr>
@@ -12,8 +12,8 @@ export default function Table({ bookings, config, keyFn }) {
                 <tbody>
                     {bookings.map((value1) => (
                         <tr key={keyFn(value1)}>
-                            {config.map((eachValue) => (
-                                <td key={eachValue.label} className="p-3 text-center">{eachValue.render(value1)}</td>
+                            {config.map((eachValue,index) => (
+                                <td key={eachValue.label} className="p-3 text-center">{eachValue.label === "#"?eachValue.render(index): eachValue.render(value1)}</td>
                             ))}
                         </tr>
                     ))}

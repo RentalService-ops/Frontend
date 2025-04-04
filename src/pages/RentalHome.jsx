@@ -7,7 +7,7 @@ import { AiOutlineAppstore } from "react-icons/ai";
 import Equipments from '../components/Equipments';
 import Categories from '../components/Categories';
 const RentalHome = ({isSidebarOpen}) => {
-  const [activeLink,setActiveLink]=useState("Home");
+  const [activeLink,setActiveLink]=useState(localStorage.getItem("state") || "Home");
   function returnComponent(){
     if(activeLink==="Home"){
       return <RentalDashboard />

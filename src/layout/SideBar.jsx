@@ -4,7 +4,10 @@ const Sidebar = ({ activeLink, setActiveLink, linkData, isOpen }) => {
       <a
         href="#"
         className={`nav-link d-flex ${activeLink === value.label ? "active" : "text-white"}`}
-        onClick={() => setActiveLink(value.label)}
+        onClick={() => {
+          setActiveLink(value.label);
+          localStorage.setItem("state",value.label);
+        }}
       >
         <div className="me-2">{value.displayButton}</div>
         {value.label}
