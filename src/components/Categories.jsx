@@ -1,3 +1,165 @@
+// import { useEffect, useState } from "react";
+// import AddCategory from "./AddCategory";
+// import EditCategory from "./EditCategory";
+// import { useCookies } from "react-cookie";
+// import { jwtDecode } from "jwt-decode";
+// import axios from "axios";
+// import Pagination from "../layout/Pagination";
+
+// export default function Categories({ isSidebarOpen }) {
+//     const [showAddCategory, setShowAddCategory] = useState(false);
+//     const [categoryData, setCategoryData] = useState([]);
+//     const [cookies] = useCookies(["jwtToken"]);
+//     const [loading, setLoading] = useState(true);
+//     const [error, setError] = useState("");
+//     const [currentPage, setCurrentPage] = useState(1);
+//     const categoriesPerPage = 6;
+//     const [showEditModal, setShowEditModal] = useState(false);
+//     const [selectedCategory, setSelectedCategory] = useState(null);
+
+//     useEffect(() => {
+//         fetchCategories();
+//     }, [cookies]);
+
+//     const fetchCategories = async () => {
+//         try {
+//             const token = cookies.jwtToken;
+//             if (!token) {
+//                 setError("Authentication token is missing.");
+//                 setLoading(false);
+//                 return;
+//             }
+
+//             const decodedToken = jwtDecode(token);
+//             const userId = decodedToken.user_id;
+
+//             const response = await axios.get(`http://localhost:8080/api/category/category/${userId}`, {
+//                 headers: { Authorization: `Bearer ${token}` },
+//                 withCredentials: true
+//             });
+
+//             setCategoryData(response.data.body);
+//             setError("");
+//         } catch (err) {
+//             setError("Failed to fetch categories. Please try again.");
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     async function handleDelete(categoryId) {
+//         try {
+//             const token = cookies.jwtToken;
+//             await axios.delete(`http://localhost:8080/api/category/category/${categoryId}`, {
+//                 headers: { Authorization: `Bearer ${token}` },
+//                 withCredentials: true
+//             });
+
+//             setCategoryData(categoryData.filter(category => category.categoryId !== categoryId));
+//         } catch (err) {
+//             alert("The category you are trying to delete is in use. Please remove the equipment associated with this category first.");
+//             console.error("Error deleting category:", err);
+//         }
+//     }
+
+//     // Pagination Logic
+//     const totalPages = Math.ceil(categoryData.length / categoriesPerPage);
+//     const indexOfLastCategory = currentPage * categoriesPerPage;
+//     const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage;
+//     const currentCategories = categoryData.slice(indexOfFirstCategory, indexOfLastCategory);
+
+//     return (
+//         <div
+//             className="container-fluid d-flex flex-column"
+//             style={{
+//                 marginLeft: isSidebarOpen ? "250px" : "0px",
+//                 transition: "margin-left 0.3s ease-in-out",
+//                 height: "100vh",
+//                 overflow: "hidden",
+//             }}
+//         >
+//             {!showAddCategory ? (
+//                 <>
+//                     <h1 className="mb-4">Categories</h1>
+
+//                     {/* Add Category Button */}
+//                     <button
+//                         className="btn btn-primary justify-content-center align-items-end ms-auto mb-2"
+//                         style={{ right: "18px" }}
+//                         onClick={() => setShowAddCategory(true)}
+//                     >
+//                         Add Category
+//                     </button>
+
+//                     {/* Categories Table */}
+//                     {loading ? (
+//                         <p>Loading categories...</p>
+//                     ) : error ? (
+//                         <p className="text-danger">{error}</p>
+//                     ) : (
+//                         <div className="d-flex flex-column flex-grow-1">
+//                             <div className="table-responsive flex-grow-1">
+//                                 <table className="table table-hover table-bordered table-striped">
+//                                     <thead className="table-dark">
+//                                         <tr>
+//                                             <th>#</th>
+//                                             <th>Category Name</th>
+//                                             <th>Description</th>
+//                                             <th>Actions</th>
+//                                         </tr>
+//                                     </thead>
+//                                     <tbody>
+//                                         {currentCategories.length > 0 ? (
+//                                             currentCategories.map((category, index) => (
+//                                                 <tr key={category.categoryId}>
+//                                                     <td>{index + 1 + (currentPage - 1) * categoriesPerPage}</td>
+//                                                     <td>{category.name}</td>
+//                                                     <td style={{ wordWrap: "break-word", maxWidth: "300px", whiteSpace: "pre-line" }}>
+//                                                         {category.description}
+//                                                     </td>
+//                                                     <td>
+//                                                         <button
+//                                                             className="btn btn-primary me-2"
+//                                                             onClick={() => {
+//                                                                 setSelectedCategory(category);
+//                                                                 setShowEditModal(true);
+//                                                             }}
+//                                                         >
+//                                                             Edit
+//                                                         </button>
+//                                                         <button className="btn btn-danger" onClick={() => handleDelete(category.categoryId)}>
+//                                                             Delete
+//                                                         </button>
+//                                                     </td>
+//                                                 </tr>
+//                                             ))
+//                                         ) : (
+//                                             <tr>
+//                                                 <td colSpan={4} className="text-center">
+//                                                     No categories found.
+//                                                 </td>
+//                                             </tr>
+//                                         )}
+//                                     </tbody>
+//                                 </table>
+//                             </div>
+
+//                             {/* Fixed Pagination at Bottom */}
+//                             <Pagination data={categoryData} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={categoriesPerPage} />
+//                         </div>
+//                     )}
+//                 </>
+//             ) : (
+//                 <AddCategory setShowAddCategory={setShowAddCategory} />
+//             )}
+
+//             {/* Edit Category Modal */}
+//             {showEditModal && <EditCategory category={selectedCategory} setShowEditModal={setShowEditModal} fetchCategories={fetchCategories} />}
+//         </div>
+//     );
+// }
+
+
 import { useEffect, useState } from "react";
 import AddCategory from "./AddCategory";
 import EditCategory from "./EditCategory";
@@ -5,156 +167,233 @@ import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Pagination from "../layout/Pagination";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function Categories({ isSidebarOpen }) {
-    const [showAddCategory, setShowAddCategory] = useState(false);
-    const [categoryData, setCategoryData] = useState([]);
-    const [cookies] = useCookies(["jwtToken"]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const categoriesPerPage = 6;
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(null);
+  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [categoryData, setCategoryData] = useState([]);
+  const [cookies] = useCookies(["jwtToken"]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const categoriesPerPage = 6;
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
-    useEffect(() => {
-        fetchCategories();
-    }, [cookies]);
+  const [showDeleteErrorModal, setShowDeleteErrorModal] = useState(false);
+const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
 
-    const fetchCategories = async () => {
-        try {
-            const token = cookies.jwtToken;
-            if (!token) {
-                setError("Authentication token is missing.");
-                setLoading(false);
-                return;
-            }
 
-            const decodedToken = jwtDecode(token);
-            const userId = decodedToken.user_id;
+  useEffect(() => {
+    fetchCategories();
+  }, [cookies]);
 
-            const response = await axios.get(`http://localhost:8080/api/category/category/${userId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-                withCredentials: true
-            });
+  const fetchCategories = async () => {
+    try {
+      const token = cookies.jwtToken;
+      if (!token) {
+        setError("Authentication token is missing.");
+        setLoading(false);
+        return;
+      }
 
-            setCategoryData(response.data.body);
-            setError("");
-        } catch (err) {
-            setError("Failed to fetch categories. Please try again.");
-        } finally {
-            setLoading(false);
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.user_id;
+
+      const response = await axios.get(
+        `http://localhost:8080/api/category/category/${userId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }
-    };
+      );
 
-    async function handleDelete(categoryId) {
-        try {
-            const token = cookies.jwtToken;
-            await axios.delete(`http://localhost:8080/api/category/category/${categoryId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-                withCredentials: true
-            });
-
-            setCategoryData(categoryData.filter(category => category.categoryId !== categoryId));
-        } catch (err) {
-            alert("The category you are trying to delete is in use. Please remove the equipment associated with this category first.");
-            console.error("Error deleting category:", err);
-        }
+      setCategoryData(response.data.body);
+      setError("");
+    } catch (err) {
+      setError("Failed to fetch categories. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    // Pagination Logic
-    const totalPages = Math.ceil(categoryData.length / categoriesPerPage);
-    const indexOfLastCategory = currentPage * categoriesPerPage;
-    const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage;
-    const currentCategories = categoryData.slice(indexOfFirstCategory, indexOfLastCategory);
+  const handleDelete = async (categoryId) => {
+    try {
+      const token = cookies.jwtToken;
+      await axios.delete(
+        `http://localhost:8080/api/category/category/${categoryId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
 
-    return (
-        <div
-            className="container-fluid d-flex flex-column"
-            style={{
-                marginLeft: isSidebarOpen ? "250px" : "0px",
-                transition: "margin-left 0.3s ease-in-out",
-                height: "100vh",
-                overflow: "hidden",
-            }}
-        >
-            {!showAddCategory ? (
-                <>
-                    <h1 className="mb-4">Categories</h1>
+      setCategoryData(
+        categoryData.filter((category) => category.categoryId !== categoryId)
+      );
+    } catch (err) {
+        setDeleteErrorMessage(
+          "The category you are trying to delete is in use. Please remove the equipment associated with this category first."
+        );
+        setShowDeleteErrorModal(true);
+        console.error("Error deleting category:", err);
+      }
+      
+  };
 
-                    {/* Add Category Button */}
-                    <button
-                        className="btn btn-primary justify-content-center align-items-end ms-auto mb-2"
-                        style={{ right: "18px" }}
-                        onClick={() => setShowAddCategory(true)}
-                    >
-                        Add Category
-                    </button>
+  const totalPages = Math.ceil(categoryData.length / categoriesPerPage);
+  const indexOfLastCategory = currentPage * categoriesPerPage;
+  const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage;
+  const currentCategories = categoryData.slice(
+    indexOfFirstCategory,
+    indexOfLastCategory
+  );
 
-                    {/* Categories Table */}
-                    {loading ? (
-                        <p>Loading categories...</p>
-                    ) : error ? (
-                        <p className="text-danger">{error}</p>
+  return (
+    <div
+      className="container-fluid d-flex flex-column bg-light py-4 px-3"
+      style={{
+        marginLeft: isSidebarOpen ? "250px" : "0px",
+        transition: "margin-left 0.3s ease-in-out",
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
+      {!showAddCategory ? (
+        <>
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h2 className="text-primary mb-0">
+              <i className="bi bi-tags-fill me-2"></i>Manage Categories
+            </h2>
+            <button
+              className="btn btn-success shadow-sm"
+              onClick={() => setShowAddCategory(true)}
+            >
+              <i className="bi bi-plus-circle me-2"></i>Add Category
+            </button>
+          </div>
+
+          {loading ? (
+            <p>Loading categories...</p>
+          ) : error ? (
+            <p className="text-danger">{error}</p>
+          ) : (
+            <div className="d-flex flex-column flex-grow-1">
+              <div className="table-responsive flex-grow-1">
+                <table className="table table-hover table-bordered table-striped shadow-sm">
+                  <thead className="table-dark text-center">
+                    <tr>
+                      <th>#</th>
+                      <th>Category Name</th>
+                      <th>Description</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-center">
+                    {currentCategories.length > 0 ? (
+                      currentCategories.map((category, index) => (
+                        <tr key={category.categoryId}>
+                          <td>
+                            {index + 1 + (currentPage - 1) * categoriesPerPage}
+                          </td>
+                          <td>{category.name}</td>
+                          <td style={{ whiteSpace: "pre-line" }}>
+                            {category.description}
+                          </td>
+                          <td>
+                            <button
+                              className="btn btn-sm btn-outline-primary me-2"
+                              onClick={() => {
+                                setSelectedCategory(category);
+                                setShowEditModal(true);
+                              }}
+                            >
+                              <i className="bi bi-pencil-square"></i>
+                            </button>
+                            <button
+                              className="btn btn-sm btn-outline-danger"
+                              onClick={() => handleDelete(category.categoryId)}
+                            >
+                              <i className="bi bi-trash3-fill"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      ))
                     ) : (
-                        <div className="d-flex flex-column flex-grow-1">
-                            <div className="table-responsive flex-grow-1">
-                                <table className="table table-hover table-bordered table-striped">
-                                    <thead className="table-dark">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Category Name</th>
-                                            <th>Description</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {currentCategories.length > 0 ? (
-                                            currentCategories.map((category, index) => (
-                                                <tr key={category.categoryId}>
-                                                    <td>{index + 1 + (currentPage - 1) * categoriesPerPage}</td>
-                                                    <td>{category.name}</td>
-                                                    <td style={{ wordWrap: "break-word", maxWidth: "300px", whiteSpace: "pre-line" }}>
-                                                        {category.description}
-                                                    </td>
-                                                    <td>
-                                                        <button
-                                                            className="btn btn-primary me-2"
-                                                            onClick={() => {
-                                                                setSelectedCategory(category);
-                                                                setShowEditModal(true);
-                                                            }}
-                                                        >
-                                                            Edit
-                                                        </button>
-                                                        <button className="btn btn-danger" onClick={() => handleDelete(category.categoryId)}>
-                                                            Delete
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan={4} className="text-center">
-                                                    No categories found.
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* Fixed Pagination at Bottom */}
-                            <Pagination data={categoryData} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={categoriesPerPage} />
-                        </div>
+                      <tr>
+                        <td colSpan={4} className="text-center">
+                          No categories found.
+                        </td>
+                      </tr>
                     )}
-                </>
-            ) : (
-                <AddCategory setShowAddCategory={setShowAddCategory} />
-            )}
+                  </tbody>
+                </table>
+              </div>
 
-            {/* Edit Category Modal */}
-            {showEditModal && <EditCategory category={selectedCategory} setShowEditModal={setShowEditModal} fetchCategories={fetchCategories} />}
+              {/* Pagination */}
+              <div className="mt-auto">
+                <Pagination
+                  data={categoryData}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                  productsPerPage={categoriesPerPage}
+                />
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        <AddCategory setShowAddCategory={setShowAddCategory} />
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <EditCategory
+          category={selectedCategory}
+          setShowEditModal={setShowEditModal}
+          fetchCategories={fetchCategories}
+        />
+      )}
+
+{showDeleteErrorModal && (
+  <>
+    <div
+      className="modal show fade d-block"
+      tabIndex="-1"
+      role="dialog"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+    >
+      <div className="modal-dialog modal-dialog-centered" role="document">
+        <div className="modal-content border border-danger shadow">
+          <div className="modal-header bg-danger text-white">
+            <h5 className="modal-title">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i> Deletion Error
+            </h5>
+            <button
+              type="button"
+              className="btn-close btn-close-white"
+              aria-label="Close"
+              onClick={() => setShowDeleteErrorModal(false)}
+            ></button>
+          </div>
+          <div className="modal-body">
+            <p>{deleteErrorMessage}</p>
+          </div>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setShowDeleteErrorModal(false)}
+            >
+              Close
+            </button>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  </>
+)}
+
+    </div>
+  );
 }
