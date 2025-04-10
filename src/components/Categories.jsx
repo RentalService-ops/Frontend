@@ -14,7 +14,7 @@ export default function Categories({ isSidebarOpen }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const categoriesPerPage = 6;
+  const categoriesPerPage = 8;
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 

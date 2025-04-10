@@ -15,7 +15,7 @@ export default function Equipments() {
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const productsPerPage = 7;
+    const productsPerPage = 5;
 
     // Modal States
     const [showDetailModal, setShowDetailModal] = useState(false);
@@ -25,7 +25,8 @@ export default function Equipments() {
     const tableData = [
         {
             label: "#",
-            render: (index) => index + 1
+            render: (equipment, index) => (currentPage - 1) * productsPerPage + index + 1
+
         },
         {
             label: "Image",

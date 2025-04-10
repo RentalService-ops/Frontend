@@ -17,6 +17,10 @@ const OrderPage = ({ isSidebarOpen }) => {
 
   const config=[
     {
+      label: "Sr No.",
+      render: (order, index) => (currentPage - 1) * ordersPerPage + index + 1,
+    },
+    {
       label:"Equipment Name",
       render:(order)=>order.equipmentName
     },

@@ -9,7 +9,6 @@ function SignupPage() {
     email: '',
     password: '',
     phoneNumber: '',
-    address: '',
     role:''
   });
 
@@ -165,21 +164,6 @@ function SignupPage() {
               onChange={handleChange}
             />
             {errors.phoneNumber && <span className="error">{errors.phoneNumber}</span>}
-          </div>
-        </div>
-
-        <div className="form-group">
-          <div className='input-wrapper'>
-            <i className="material-symbols-outlined">home</i>
-            <input
-              type="text"
-              id="address"
-              name="address"
-              placeholder="Enter your address"
-              className="input-field"
-              value={formData.address}
-              onChange={handleChange}
-            />
           </div>
         </div>
         

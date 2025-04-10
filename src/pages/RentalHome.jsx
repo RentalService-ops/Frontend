@@ -6,6 +6,10 @@ import { IoAddCircleOutline } from "react-icons/io5";
 import { AiOutlineAppstore } from "react-icons/ai";
 import Equipments from '../components/Equipments';
 import Categories from '../components/Categories';
+import RentalBookings from '../components/RentalBookings';
+import RentalBookingHistory from '../components/RentalBookingHistory';
+
+
 const RentalHome = ({isSidebarOpen}) => {
   const [activeLink,setActiveLink]=useState(localStorage.getItem("state") || "Home");
   function returnComponent(){
@@ -17,6 +21,12 @@ const RentalHome = ({isSidebarOpen}) => {
     }
     else if(activeLink==="My Equipments"){
       return <Equipments />
+    }
+    else if(activeLink==="My Bookings"){
+      return <RentalBookings />
+    }
+    else if(activeLink==="History"){
+      return <RentalBookingHistory />
     }
   }
   const linkData=[
@@ -30,6 +40,14 @@ const RentalHome = ({isSidebarOpen}) => {
     },
     {
       label:"My Equipments",
+      displayButton:<AiOutlineAppstore />
+    },
+    {
+      label:"My Bookings",
+      displayButton:<AiOutlineAppstore />
+    },
+    {
+      label:"History",
       displayButton:<AiOutlineAppstore />
     }
   ];

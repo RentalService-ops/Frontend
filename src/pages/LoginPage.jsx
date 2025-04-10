@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/index.css";
-import SocialLogin from "../components/SocialLogin";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -86,7 +85,6 @@ const LoginPage = ({ setIsAuthenticated, isAuthenticated }) => {
     <div className="login-container">
       <form className="login-form" onSubmit={handleSubmit} noValidate>
         <h2 className="form-title">Login</h2>
-        <SocialLogin />
         <p className="separator">
           <span>or</span>
         </p>

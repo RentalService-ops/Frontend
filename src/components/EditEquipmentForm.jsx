@@ -5,7 +5,7 @@ export default function EditEquipmentForm({showEditModal,handleSaveEdit,equipmen
 
   useEffect(()=>{
     setEditedEquipment(equipment);
-  },[])
+  },[equipment])
   
   const handleImageChange = (e) => {
     const file = e.target.files[0];
