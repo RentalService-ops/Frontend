@@ -22,7 +22,7 @@ const RentalHome = ({isSidebarOpen}) => {
     else if(activeLink==="My Equipments"){
       return <Equipments />
     }
-    else if(activeLink==="My Bookings"){
+    else if(activeLink==="Pending Bookings"){
       return <RentalBookings />
     }
     else if(activeLink==="History"){
@@ -43,7 +43,7 @@ const RentalHome = ({isSidebarOpen}) => {
       displayButton:<AiOutlineAppstore />
     },
     {
-      label:"My Bookings",
+      label:"Pending Bookings",
       displayButton:<AiOutlineAppstore />
     },
     {

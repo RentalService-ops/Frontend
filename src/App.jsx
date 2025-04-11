@@ -13,6 +13,8 @@ import Profile from "./pages/Profile";
 import NavBar from "./layout/NavBar";
 
 import "./styles/index.css";
+import ForgotPassword from "./components/ForgotPassword";
+import EmailVerification from "./components/EmailVerification";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -58,6 +60,8 @@ function App() {
             <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
             <Route path="/register" element={<SignupPage />} />
             <Route path="/contact-us" element={<ContactUs />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/verify-email" element={<EmailVerification />} />
           </Routes>
       <Footer />
     </Router>

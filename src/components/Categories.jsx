@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Pagination from "../layout/Pagination";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import Table from "./Table";
 
 export default function Categories({ isSidebarOpen }) {
   const [showAddCategory, setShowAddCategory] = useState(false);
@@ -20,6 +21,39 @@ export default function Categories({ isSidebarOpen }) {
 
   const [showDeleteErrorModal, setShowDeleteErrorModal] = useState(false);
 const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
+    const config = [
+        {
+            label: "Category Name",
+            render: (category) => category.name
+        },
+        {
+            label: "Description",
+            render: (category) => category.description
+        },
+        {
+            label: "Actions",
+            render: (category) => (
+                <>
+                    <button
+                        className="btn btn-primary me-2"
+                        onClick={() => {
+                            setSelectedCategory(category);
+                            setShowEditModal(true);
+                        }}
+                    >
+                        Edit
+                    </button>
+                    <button className="btn btn-danger" onClick={() => handleDelete(category.categoryId)}>
+                        Delete
+                    </button>
+                </>
+            )
+        }
+    ];
+
+    useEffect(() => {
+        fetchCategories();
+    }, [cookies]);
 
 
   useEffect(() => {
@@ -79,7 +113,6 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
       
   };
 
-  const totalPages = Math.ceil(categoryData.length / categoriesPerPage);
   const indexOfLastCategory = currentPage * categoriesPerPage;
   const indexOfFirstCategory = indexOfLastCategory - categoriesPerPage;
   const currentCategories = categoryData.slice(
@@ -89,7 +122,7 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
 
   return (
     <div
-      className="container-fluid d-flex flex-column bg-light py-4 px-3"
+      className="container-fluid d-flex flex-column bg-white py-4 px-3"
       style={{
         marginLeft: isSidebarOpen ? "250px" : "0px",
         transition: "margin-left 0.3s ease-in-out",
@@ -116,56 +149,14 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
           ) : error ? (
             <p className="text-danger">{error}</p>
           ) : (
-            <div className="d-flex flex-column flex-grow-1">
-              <div className="table-responsive flex-grow-1">
-                <table className="table table-hover table-bordered table-striped shadow-sm">
-                  <thead className="table-dark text-center">
-                    <tr>
-                      <th>#</th>
-                      <th>Category Name</th>
-                      <th>Description</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-center">
-                    {currentCategories.length > 0 ? (
-                      currentCategories.map((category, index) => (
-                        <tr key={category.categoryId}>
-                          <td>
-                            {index + 1 + (currentPage - 1) * categoriesPerPage}
-                          </td>
-                          <td>{category.name}</td>
-                          <td style={{ whiteSpace: "pre-line" }}>
-                            {category.description}
-                          </td>
-                          <td>
-                            <button
-                              className="btn btn-sm btn-outline-primary me-2"
-                              onClick={() => {
-                                setSelectedCategory(category);
-                                setShowEditModal(true);
-                              }}
-                            >
-                              <i className="bi bi-pencil-square"></i>
-                            </button>
-                            <button
-                              className="btn btn-sm btn-outline-danger"
-                              onClick={() => handleDelete(category.categoryId)}
-                            >
-                              <i className="bi bi-trash3-fill"></i>
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={4} className="text-center">
-                          No categories found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+              <>
+              <div className="d-flex flex-column flex-grow-1">
+                  { categoryData.length > 0 &&
+                  <Table config={config} keyFn={(category)=>category.categoryId} bookings={currentCategories}/>
+                  } 
+
+                  {/* Fixed Pagination at Bottom */}
+                  <Pagination data={categoryData} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={categoriesPerPage} />
               </div>
 
               {/* Pagination */}
@@ -177,7 +168,7 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
                   productsPerPage={categoriesPerPage}
                 />
               </div>
-            </div>
+              </>
           )}
         </>
       ) : (

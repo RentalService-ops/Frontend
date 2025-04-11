@@ -35,7 +35,6 @@ export default function RentalDashboard() {
   }, [cookies.jwtToken]);
 
   const config = [
-    { label: "#", render: (booking) => booking.bookingId },
     { label: "User", render: (booking) => booking.userName },
     { label: "Equipment", render: (booking) => booking.equipmentName },
     { label: "Quantity", render: (booking) => booking.equipmentQuantity },

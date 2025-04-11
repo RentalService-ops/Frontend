@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import "../styles/index.css";
 import { useCookies } from "react-cookie";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 
 const LoginPage = ({ setIsAuthenticated, isAuthenticated }) => {
   const [cookies, setCookie] = useCookies(["jwtToken", "role"]);
@@ -54,16 +53,11 @@ const LoginPage = ({ setIsAuthenticated, isAuthenticated }) => {
         email: formData.email,
         password: formData.password
       }, { withCredentials: true });
-  
-      let userRole = jwtDecode(response.data.token).role;
-      console.log("User Role:", userRole);
-  
-      setCookie("role", userRole, { path: "/", maxAge: 86400, sameSite: "Strict" });
       
       setIsAuthenticated(true);
   
       setTimeout(() => {
-        navigate(getHomeRoute(userRole)); // Navigate first
+        navigate("/"); // Navigate first
         window.location.reload(); // Reload after navigation
       }, 1);
       
@@ -82,12 +76,10 @@ const LoginPage = ({ setIsAuthenticated, isAuthenticated }) => {
   }, [isAuthenticated, cookies.role, navigate, getHomeRoute]);
 
   return (
+    <div  style={{height:"80vh"}}>
     <div className="login-container">
       <form className="login-form" onSubmit={handleSubmit} noValidate>
         <h2 className="form-title">Login</h2>
-        <p className="separator">
-          <span>or</span>
-        </p>
 
         {loginError && <p className="error-message">{loginError}</p>}
 
@@ -130,7 +122,11 @@ const LoginPage = ({ setIsAuthenticated, isAuthenticated }) => {
         <p className="signup-prompt">
           Don&apos;t have an account? <Link to="/register">Sign Up</Link>
         </p>
+        <p className="signup-prompt">
+          Forgot password? <Link to="/verify-email">Forgot Password</Link>
+        </p>
       </form>
+    </div>
     </div>
   );
 };

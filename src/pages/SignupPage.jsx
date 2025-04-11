@@ -39,8 +39,14 @@ function SignupPage() {
     // Password Validation
     if (!formData.password) {
       errors.password = 'Password is required.';
-    } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters.';
+    } else if (formData.password.length < 8) {
+      errors.password = 'Password must be at least 8 characters.';
+    }
+    else{
+      const passwordPattern= /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+      if(!passwordPattern.test(formData.password)){
+        errors.password="Password should contain at lease one uppercase character, at least one number and at least one special character.";
+      }
     }
 
     // Phone Number Validation

@@ -73,7 +73,7 @@ const Navbar = ({ toggleSidebar }) => {
           onClick={toggleSidebar}
           aria-label="Toggle sidebar"
         >
-          <img src="hamburger.png" alt="menu" style={{ height: "auto", width: "25px" }} />
+          <i><img src="hamburger.png" style={{height:"auto",width:"25px"}}/></i>
         </button>
 
         <Link className="navbar-brand" to="/">Rental Service</Link>

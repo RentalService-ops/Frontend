@@ -100,7 +100,7 @@ export default function AddEquipment({setShowAddEquipment}) {
             setImageSrc("");
         } catch (err) {
             console.error("❌ Error adding equipment:", err);
-            alert(err.response?.data?.message || "Failed to add equipment. Please try again.");
+            alert(err.message || "Failed to add equipment. Please try again.");
         } finally {
             setLoading(false); // Enable button after request
         }

@@ -24,11 +24,6 @@ export default function Equipments() {
 
     const tableData = [
         {
-            label: "#",
-            render: (equipment, index) => (currentPage - 1) * productsPerPage + index + 1
-
-        },
-        {
             label: "Image",
             render: (equipment) => (<img src={imageUrls[equipment.imageUrl] || "/defaultImage.png"} alt="equipment" style={{ width: "50px", height: "50px" }} />)
         },
@@ -155,7 +150,7 @@ export default function Equipments() {
             );
             setShowEditModal(false);
         } catch (err) {
-            console.error("❌ Error updating equipment:", err);
+            console.error("❌ Error updating equipment:", err.message);
             alert(err.response?.data?.message || "Failed to update equipment.");
         }
     };
@@ -184,17 +179,17 @@ export default function Equipments() {
                         </Modal.Header>
                         <Modal.Body>
                             {selectedEquipment && (
-                                <div className="row">
-                                    <div className="col-md-7">
+                                <div className="d-flex flex-column">
+                                    <div>
+                                        <img src={imageUrls[selectedEquipment.imageUrl] || "/defaultImage.png"}
+                                            alt="equipment" className="img-fluid rounded shadow-sm"
+                                            style={{ width: "100%", height: "auto" }} />
+                                    </div>
+                                    <div>
                                         <p><strong>Name:</strong> {selectedEquipment.name}</p>
                                         <p><strong>Price Per Day:</strong> ${selectedEquipment.pricePerDay}</p>
                                         <p><strong>Quantity:</strong> {selectedEquipment.quantity}</p>
                                         <p><strong>Description:</strong> {selectedEquipment.description}</p>
-                                    </div>
-                                    <div className="col-md-5 text-center">
-                                        <img src={imageUrls[selectedEquipment.imageUrl] || "/defaultImage.png"}
-                                            alt="equipment" className="img-fluid rounded shadow-sm"
-                                            style={{ maxWidth: "100%", maxHeight: "250px" }} />
                                     </div>
                                 </div>
                             )}
@@ -205,7 +200,7 @@ export default function Equipments() {
                         </Modal.Footer>
                     </Modal>
 
-                    <EditEquipmentForm equipment={{ ...selectedEquipment, imagePreview: imageUrls[selectedEquipment?.imageUrl] || "/defaultImage.png" }} showEditModal={showEditModal} handleSaveEdit={handleSaveEdit} setShowEditModal={setShowEditModal}/>
+                    <EditEquipmentForm equipment={{ ...selectedEquipment, imagePreview: imageUrls[selectedEquipment?.imageUrl] || "/defaultImage.png" }} showEditModal={showEditModal} handleSaveEdit={handleSaveEdit} setShowEditModal={setShowEditModal} />
                 </>
             ) : (
                 <AddEquipment setShowAddEquipment={setShowAddEquipment} />
