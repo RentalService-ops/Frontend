@@ -86,7 +86,7 @@ function SignupPage() {
       }
 
       // Reset form after successful submission
-      setFormData({ username: '', email: '', password: '', phoneNumber: '', address: '',role:'' });
+      setFormData({ username: '', email: '', password: '', phoneNumber: '',role:'' });
     }
 
   };

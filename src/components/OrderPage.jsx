@@ -70,10 +70,10 @@ const OrderPage = ({ isSidebarOpen }) => {
         setLoading(false);
         return;
       }
-
+  
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.user_id;
-
+  
       const response = await axios.get(
         `http://localhost:8080/api/bookings/bookingDetails/${userId}`,
         {
@@ -81,15 +81,23 @@ const OrderPage = ({ isSidebarOpen }) => {
           withCredentials: true,
         }
       );
-
+  
       setOrders(response.data);
+      setError(null); // Clear any previous errors
     } catch (error) {
       console.error("Error fetching orders:", error);
-      setError("Failed to fetch orders. Please try again.");
+      if (error.response && error.response.status === 404) {
+        // No bookings found
+        setOrders([]); // Clear any previous orders
+        setError("NO_ORDERS"); // Special case for no orders
+      } else {
+        setError("GENERAL_ERROR");
+      }
     } finally {
       setLoading(false);
     }
   };
+  
 
   const cancelOrder = async () => {
     if (!selectedOrderId) return;
@@ -152,97 +160,111 @@ const OrderPage = ({ isSidebarOpen }) => {
 
   return (
     <>
+  <div
+    className="container-fluid d-flex flex-column bg-light"
+    style={{
+      marginLeft: isSidebarOpen ? "250px" : "0px",
+      transition: "margin-left 0.3s ease-in-out",
+      height: "100vh",
+      overflow: "auto",
+      padding: "20px",
+    }}
+  >
+    <h2 className="mb-4 fw-bold text-primary"> My Orders</h2>
+
+    {/* Filter */}
+    <div className="card shadow-sm mb-4 border-0">
+      <div className="card-body">
+        <h5 className="card-title text-secondary">Filter Orders</h5>
+        <div className="d-flex flex-wrap gap-2">
+          {["ALL", ...bookingStatuses].map((status) => (
+            <button
+              key={status}
+              className={`btn ${
+                activeTab === status ? "btn-primary" : "btn-outline-primary"
+              } rounded-pill px-3 py-1`}
+              onClick={() => setActiveTab(status)}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {/* Table or Loading/Error */}
+    {loading ? (
+      <p className="text-muted">⏳ Loading orders...</p>
+    ) : error === "NO_ORDERS" ? (
+      <div className="alert alert-info text-center">
+        No bookings at the moment.
+      </div>
+    ) : error === "GENERAL_ERROR" ? (
+      <p className="text-danger">Failed to fetch orders. Please try again.</p>
+    ) : (
+      <div className="d-flex flex-column flex-grow-1">
+        <Table
+          config={config}
+          bookings={currentOrders}
+          keyFn={(booking) => booking.bookingId}
+        />
+
+        {/* Pagination */}
+        <div className="d-flex justify-content-center mt-auto">
+          <Pagination
+            data={filteredOrders}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            productsPerPage={ordersPerPage}
+          />
+        </div>
+      </div>
+    )}
+  </div>
+
+  {/* Modal */}
+  {showModal && (
+    <>
       <div
-        className="container-fluid d-flex flex-column bg-light"
-        style={{
-          marginLeft: isSidebarOpen ? "250px" : "0px",
-          transition: "margin-left 0.3s ease-in-out",
-          height: "100vh",
-          overflow: "auto",
-          padding: "20px",
-        }}
+        className="modal fade show d-block"
+        tabIndex="-1"
+        style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
       >
-        <h2 className="mb-4 fw-bold text-primary"> My Orders</h2>
-  
-        {/* Filter */}
-        <div className="card shadow-sm mb-4 border-0">
-          <div className="card-body">
-            <h5 className="card-title text-secondary">Filter Orders</h5>
-            <div className="d-flex flex-wrap gap-2">
-              {["ALL", ...bookingStatuses].map((status) => (
-                <button
-                  key={status}
-                  className={`btn ${
-                    activeTab === status ? "btn-primary" : "btn-outline-primary"
-                  } rounded-pill px-3 py-1`}
-                  onClick={() => setActiveTab(status)}
-                >
-                  {status}
-                </button>
-              ))}
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content shadow-lg">
+            <div className="modal-header bg-danger text-white">
+              <h5 className="modal-title">Cancel Order</h5>
+              <button
+                type="button"
+                className="btn-close btn-close-white"
+                onClick={() => setShowModal(false)}
+              ></button>
+            </div>
+            <div className="modal-body">
+              <p>Are you sure you want to cancel this order?</p>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn btn-secondary rounded-pill"
+                onClick={() => setShowModal(false)}
+              >
+                Close
+              </button>
+              <button
+                className="btn btn-danger rounded-pill"
+                onClick={cancelOrder}
+              >
+                Yes, Cancel
+              </button>
             </div>
           </div>
         </div>
-  
-        {/* Table or Loading/Error */}
-        {loading ? (
-          <p className="text-muted">⏳ Loading orders...</p>
-        ) : error ? (
-          <p className="text-danger">{error}</p>
-        ) : (
-          <div className="d-flex flex-column flex-grow-1">
-            <Table config={config} bookings={currentOrders} keyFn={(booking)=>booking.bookingId} />
-  
-            {/* Pagination */}
-            <div className="d-flex justify-content-center mt-auto">
-              <Pagination data={filteredOrders} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={ordersPerPage} />
-            </div>
-          </div>
-        )}
       </div>
-  
-      {/* Modal */}
-      {showModal && (
-        <>
-          <div
-            className="modal fade show d-block"
-            tabIndex="-1"
-            style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-          >
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content shadow-lg">
-                <div className="modal-header bg-danger text-white">
-                  <h5 className="modal-title">Cancel Order</h5>
-                  <button
-                    type="button"
-                    className="btn-close btn-close-white"
-                    onClick={() => setShowModal(false)}
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  <p>Are you sure you want to cancel this order?</p>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    className="btn btn-secondary rounded-pill"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Close
-                  </button>
-                  <button
-                    className="btn btn-danger rounded-pill"
-                    onClick={cancelOrder}
-                  >
-                    Yes, Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="modal-backdrop fade show"></div>
-        </>
-      )}
+      <div className="modal-backdrop fade show"></div>
     </>
+  )}
+</>
+
   );
   
 };

@@ -174,7 +174,7 @@ const UserDashboard = ({ isSidebarOpen }) => {
                   <div className="d-flex justify-content-between align-items-center mt-2">
                     <Button
                       variant="primary"
-                      disabled={product.quantity === 0}
+                      disabled={product.quantity <= 0}
                       onClick={() => handleProductClick(product)}
                     >
                       Rent Now

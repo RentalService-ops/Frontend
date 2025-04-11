@@ -1,119 +1,129 @@
-import { useState } from "react"
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"
+import axios from "axios";
+
 export default function ForgotPassword() {
     const [showSetPassword, setShowSetPassword] = useState(false);
-    const [enteredOTPValue,setEnteredOTPValue]=useState("");
-    const navigate=useNavigate();
+    const [enteredOTPValue, setEnteredOTPValue] = useState("");
+    const [resetPassword, setResetPassword] = useState("");
+    const [confirmResetPassword, setConfirmResetPassword] = useState("");
+    const navigate = useNavigate();
 
-    const [resetPassword,setResetPassword]=useState("");
-    const [confirmResetPassword,setConfirmResetPassword]=useState("");
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, []);
 
-    async function handleClick(){
-        console.log(enteredOTPValue)
-        try{
-            const response=await axios.post(`http://localhost:8080/verify-otp`,{
-                email:`${localStorage.getItem("email")}`,
-                sentOTP:enteredOTPValue
-            })
+    async function handleClick() {
+        try {
+            const response = await axios.post(`http://localhost:8080/verify-otp`, {
+                email: `${localStorage.getItem("email")}`,
+                sentOTP: enteredOTPValue
+            });
 
-            if(response.data==="OTP verified"){
+            if (response.data === "OTP verified") {
                 setShowSetPassword(true);
             }
-        }
-        catch(err){
-            if(err.response?.status===401){
+        } catch (err) {
+            if (err.response?.status === 401) {
                 alert("Wrong OTP Entered!!");
                 localStorage.removeItem("email");
                 navigate("/verify-email");
             }
-            console.log(err)
-        }
-        finally{
-            setEnteredOTPValue("")
+            console.log(err);
+        } finally {
+            setEnteredOTPValue("");
         }
     }
 
-    async function handleResetPassword(){
-        const passwordPattern= /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
-        if(resetPassword.length < 8){
+    async function handleResetPassword() {
+        const passwordPattern = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+
+        if (resetPassword.length < 8) {
             alert("Password must contain at least 8 characters.");
-            setConfirmResetPassword("");
-            setResetPassword("");
+        } else if (!passwordPattern.test(resetPassword)) {
+            alert("Password should contain at least one uppercase character, one number, and one special character.");
+        } else if (resetPassword !== confirmResetPassword) {
+            alert("Passwords do not match.");
+        } else {
+            try {
+                await axios.post(`http://localhost:8080/reset-password`, {
+                    email: `${localStorage.getItem("email")}`,
+                    resetPassword: resetPassword
+                });
+                alert("Your password has been reset.");
+                localStorage.removeItem("email");
+                navigate("/login");
+            } catch (err) {
+                console.log(err.message);
+            }
         }
-        else if(!passwordPattern.test(resetPassword)){
-            alert("Password should contain at lease one uppercase character, at least one number and at least one special character.");
-            setConfirmResetPassword("");
-            setResetPassword("");
-        }
-        else if(resetPassword !== confirmResetPassword){
-            alert("Passwords should match.");
-            setResetPassword("");
-            setConfirmResetPassword("");
-        }
-        else{
-                try{
-                    await axios.post(`http://localhost:8080/reset-password`,{
-                        email:`${localStorage.getItem("email")}`,
-                        resetPassword:resetPassword
-                    })
-                    setResetPassword("");
-                    setConfirmResetPassword("");
-                    localStorage.removeItem("email");
-                    alert("Your password has been reset.");
-                    navigate("/login");
-                }
-                catch(err){
-                    console.log(err.message);
-                }   
-        }
+        setResetPassword("");
+        setConfirmResetPassword("");
     }
 
     return (
-        <div style={{ height: "80vh" }}>
-            {showSetPassword ?
-                <div className="login-container">
-                    <h1>Reset Password</h1>
-                    <div className="form-group mb-3">
-                        <div className="input-wrapper">
-                            <label>Enter new password</label>
+        <div style={{
+            height: "100vh",
+            width: "100vw",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#f8f9fa"
+        }}>
+            <div className="card shadow p-4" style={{ maxWidth: "400px", width: "100%", borderRadius: "15px" }}>
+                {showSetPassword ? (
+                    <>
+                        <h4 className="text-center mb-4">Reset Password</h4>
+                        <div className="form-group mb-3">
+                            <label htmlFor="newPass">New Password</label>
                             <input
+                                id="newPass"
                                 type="password"
-                                className="input-field"
+                                className="form-control"
                                 value={resetPassword}
+                                onChange={(e) => setResetPassword(e.target.value)}
                                 required
-                                onChange={(e)=>setResetPassword(e.target.value)}
                             />
-                            <label>Confirm New Password</label>
+                        </div>
+                        <div className="form-group mb-3">
+                            <label htmlFor="confirmPass">Confirm New Password</label>
                             <input
+                                id="confirmPass"
                                 type="password"
-                                className="input-field"
+                                className="form-control"
                                 value={confirmResetPassword}
+                                onChange={(e) => setConfirmResetPassword(e.target.value)}
                                 required
-                                onChange={(e)=>setConfirmResetPassword(e.target.value)}
                             />
-                            <br />
-                            <button className="btn btn-primary" onClick={handleResetPassword}>Reset Password</button>
                         </div>
-                    </div>
-                </div> :
-                <div className="login-container">
-                    <h1>OTP Verification</h1>
-                    <div className="form-group mb-3">
-                        <div className="input-wrapper">
+                        <button className="btn btn-primary w-100" onClick={handleResetPassword}>
+                            Reset Password
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <h4 className="text-center mb-4">OTP Verification</h4>
+                        <div className="form-group mb-3">
+                            {/* <label htmlFor="otpInput">Enter OTP</label> */}
                             <input
+                                id="otpInput"
                                 type="number"
+                                className="form-control"
                                 placeholder="Enter your OTP"
-                                className="input-field"
                                 value={enteredOTPValue}
+                                onChange={(e) => setEnteredOTPValue(e.target.value)}
                                 required
-                                onChange={(e)=>setEnteredOTPValue(e.target.value)}
                             />
                         </div>
-                    </div>
-                    <button className="btn btn-primary" onClick={handleClick}>Verify</button>
-                </div>
-            }
+                        <button className="btn btn-primary w-100" onClick={handleClick}>
+                            Verify OTP
+                        </button>
+                    </>
+                )}
+            </div>
         </div>
-    )
+    );
 }
