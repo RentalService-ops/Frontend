@@ -68,7 +68,7 @@ export default function ProfilePage() {
     console.log(formData);
     
     try {
-      await axios.post(`http://localhost:8080/api/user/updateUser`, formData, {
+      await axios.put(`http://localhost:8080/api/user/updateUser`, formData, {
         headers: { Authorization: `Bearer ${cookies.jwtToken}` },
         params:{
             id:`${userId}`

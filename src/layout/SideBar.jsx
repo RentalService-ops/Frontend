@@ -19,11 +19,11 @@ const Sidebar = ({ activeLink, setActiveLink, linkData, isOpen }) => {
     <div
       className={`bg-dark text-white p-3 ${isOpen ? 'sticky-top' : 'position-fixed'}`}
       style={{
-        width: "280px",
+        minWidth: "280px",
         height: "100vh",
         left: isOpen ? "0px" : "-280px", // Hide sidebar by shifting it left
         transition: "left 0.3s ease-in-out", // Smooth transition
-        zIndex: 1060, // Ensure it's above other elements
+        zIndex: 1050, // Ensure it's above other elements
       }}
     >
       <ul className="nav nav-pills flex-column mb-auto">{renderedLinks}</ul>
