@@ -63,6 +63,7 @@ const LoginPage = ({ setIsAuthenticated, isAuthenticated }) => {
       
     } catch (err) {
       console.error("Login Error:", err);
+      alert("Invalid login credentails!!");
     }
   };
   
