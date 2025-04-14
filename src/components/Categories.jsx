@@ -90,6 +90,9 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
   };
 
   const handleDelete = async (categoryId) => {
+    const confirmDelete=window.confirm("Deleting category will result deleting all the Equipments associated with this category. Are you sure want to delete this category?");
+    
+    if(confirmDelete){
     try {
       const token = cookies.jwtToken;
       await axios.delete(
@@ -105,12 +108,13 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
       );
     } catch (err) {
         setDeleteErrorMessage(
-          "The category you are trying to delete is in use. Please remove the equipment associated with this category first."
+          "Failed to delete category."
         );
         setShowDeleteErrorModal(true);
         console.error("Error deleting category:", err);
       }
-      
+    }
+
   };
 
   const indexOfLastCategory = currentPage * categoriesPerPage;
