@@ -67,14 +67,14 @@ const Navbar = ({ toggleSidebar }) => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom">
       <div className="container-fluid">
-        <button
+        {cookies.jwtToken && jwtDecode(cookies.jwtToken).role !== "admin" ? <button
           className="btn btn-outline-secondary me-2"
           type="button"
           onClick={toggleSidebar}
           aria-label="Toggle sidebar"
         >
-          <i><img src="hamburger.png" style={{height:"auto",width:"25px"}}/></i>
-        </button>
+          <img src="hamburger.png" alt="menu" style={{ height: "auto", width: "25px" }} />
+        </button> : <></>}
 
         <Link className="navbar-brand" to="/">Rental Service</Link>
 
