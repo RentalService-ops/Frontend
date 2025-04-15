@@ -1,17 +1,26 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
-import AdminPagination from "./AdminPagination";
+import Table from "../Table"
+import Pagination from "../../layout/Pagination"
 
 const AdminBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [cookie] = useCookies();
 
-  const productsPerPage = 2;
+  const productsPerPage = 5;
+
+  const config=[
+    {label:"Renter",render:(booking)=>booking.renterName},
+    {label:"Total bookings",render:(booking)=>booking.totalBookingsByRenter},
+    {label:"Approved bookings",render:(booking)=> null},
+    {label:"Rejected bookings",render:(booking)=>null},
+    {label:"Pending bookings",render:(booking)=>null},
+    {label:"Cancelled bookings",render:(booking)=>null}
+  ]
 
   useEffect(() => {
     fetchBookings();
@@ -27,7 +36,6 @@ const AdminBookings = () => {
         }
       );
       setBookings(response.data.content);
-      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching bookings", error);
     } finally {
@@ -49,71 +57,11 @@ const AdminBookings = () => {
         className="mb-4 p-2 border rounded w-full"
       />
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border rounded-lg shadow-md">
-          <thead>
-            <tr className="bg-gray-100 text-left">
-              <th className="p-3 border">Booking ID</th>
-              <th className="p-3 border">Quantity</th>
-              <th className="p-3 border">Owner</th>
-              <th className="p-3 border">Customer</th>
-              <th className="p-3 border">Equipment Name</th>
-              <th className="p-3 border">Bookings by Renter</th>
-              <th className="p-3 border">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="6" className="p-4 text-center text-gray-500">
-                  Loading bookings...
-                </td>
-              </tr>
-            ) : bookings.length > 0 ? (
-              bookings.map((booking) => (
-                <tr key={booking.bookingId} className="border-b hover:bg-gray-50">
-                  <td className="p-3 border">{booking.bookingId}</td>
-                  <td className="p-3 border">{booking.equipmentQuantity}</td>
-                  <td className="p-3 border">{booking.renterName}</td>
-                  <td className="p-3 border">{booking.userName}</td>
-                  <td className="p-3 border">{booking.equipmentName}</td>
-                  <td className="p-3 border">{booking.totalBookingsByRenter}</td>
-                  <td className="p-3 border">
-                    <span
-                      className={`px-3 py-1 rounded-full ${booking.status === "PENDING"
-                        ? "bg-yellow-200"
-                        : booking.status === "APPROVED"
-                          ? "bg-green-200"
-                          : "bg-red-200"
-                        }`}
-                    >
-                      {booking.status}
-                    </span>
-                  </td>
-                  <td className="p-3 border space-x-2">
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="p-4 text-center text-gray-500">
-                  No bookings found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="d-flex flex-column flex-grow-1">
+        {loading ? <>Loading</> : <Table config={config} bookings={bookings}  keyFn={(booking)=>booking.bookingId}/>}
       </div>
 
-      {/* Pagination Component */}
-
-      <div className="m-5">
-        <AdminPagination
-          totalPages={totalPages}
-          currentPage={page}
-          setCurrentPage={setPage}
-          />
-      </div>
+      <Pagination data={bookings} currentPage={page} setCurrentPage={setPage} productsPerPage={productsPerPage}  />
     </div>
   );
 };

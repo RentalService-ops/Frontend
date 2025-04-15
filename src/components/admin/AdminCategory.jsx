@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import AdminPagination from "./AdminPagination";
+import Pagination from "../../layout/Pagination"
+import Table from "../Table"
 
 const AdminCategory = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(1);
+  const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
 
   const productsPerPage = 4;
@@ -41,7 +41,7 @@ const AdminCategory = () => {
 
   useEffect(() => {
     fetchCategories();
-  }, [page, size]);
+  }, [page]);
 
   return (
     <div className="m-4 p-6">
@@ -71,15 +71,7 @@ const AdminCategory = () => {
         </table>
       )}
 
-      {/* Pagination Component */}
-      <div className="m-5">
-
-        <AdminPagination
-          totalPages={totalPages}
-          currentPage={page}
-          setCurrentPage={setPage}
-        />
-      </div>
+      <Pagination data={categories} currentPage={page} setCurrentPage={setPage} productsPerPage={productsPerPage}  totalPages={totalPages}/>
     </div>
   );
 };

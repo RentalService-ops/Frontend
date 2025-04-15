@@ -1,6 +1,15 @@
-export default function Pagination({data,currentPage,setCurrentPage,productsPerPage}){
+import { useState,useEffect } from "react";
+
+export default function Pagination({data,currentPage,setCurrentPage,productsPerPage,...rest}){
     const length= data?.length || 0;
-    const totalPages = Math.ceil(length / productsPerPage);
+    const allPages = Math.ceil(length / productsPerPage);
+    const [providedPages,setProvidedPages]=useState(0);
+
+    useEffect(()=>{
+        setProvidedPages(rest.totalPages);
+    },[rest.totalPages])
+    
+    const totalPages = rest.totalPages ? providedPages : allPages;
     return(
         <> 
            {totalPages > 1 && (
@@ -20,7 +29,7 @@ export default function Pagination({data,currentPage,setCurrentPage,productsPerP
                                         Previous
                                     </button>
                                     <span>
-                                        Page {currentPage} of {totalPages}
+                                        Page {currentPage} of {totalPages }
                                     </span>
                                     <button
                                         className="btn btn-outline-primary ms-2"

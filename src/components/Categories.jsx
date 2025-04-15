@@ -15,7 +15,7 @@ export default function Categories({ isSidebarOpen }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const categoriesPerPage = 8;
+  const categoriesPerPage = 4;
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -161,16 +161,6 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
 
                   {/* Fixed Pagination at Bottom */}
                   <Pagination data={categoryData} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={categoriesPerPage} />
-              </div>
-
-              {/* Pagination */}
-              <div className="mt-auto">
-                <Pagination
-                  data={categoryData}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  productsPerPage={categoriesPerPage}
-                />
               </div>
               </>
           )}

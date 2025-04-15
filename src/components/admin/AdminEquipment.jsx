@@ -12,8 +12,7 @@ const AdminEquipment = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [cookie] = useCookies();
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
+
   const productsPerPage = 3;
 
   useEffect(() => {
