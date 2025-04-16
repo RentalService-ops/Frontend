@@ -1,6 +1,6 @@
 import { useState } from "react";
 import UserDashboard from "../components/UserDashboard";
-import OrderPage from "../components/OrderPage";
+import OrderPage from "./OrderPage";
 import { FaHome } from "react-icons/fa";
 import { IoAddCircleOutline } from "react-icons/io5";
 import Sidebar from "../layout/SideBar";

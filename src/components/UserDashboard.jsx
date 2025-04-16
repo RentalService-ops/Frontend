@@ -54,7 +54,7 @@ const UserDashboard = ({ isSidebarOpen }) => {
     };
 
     fetchProducts();
-  }, [cookies.jwtToken]);
+  }, [products,cookies.jwtToken]);
 
   const fetchImages = async (data) => {
     const imageMap = {};

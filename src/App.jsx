@@ -57,6 +57,7 @@ function App() {
     <Router>
       <NavBar toggleSidebar={toggleSidebar} />
           <Routes>
+
             <Route path="/" element={isAuthenticated ? <Navigate to={getHomeRoute()} /> : <Dashboard />} />
             <Route path="/admin/*" element={isAuthenticated && cookies?.role === "admin" ? <AdminLayout /> : <Navigate to="/login" />}>
             <Route path="users" element={<AdminUsers />} />

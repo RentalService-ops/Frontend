@@ -53,12 +53,7 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
 
     useEffect(() => {
         fetchCategories();
-    }, [cookies]);
-
-
-  useEffect(() => {
-    fetchCategories();
-  }, [cookies]);
+    }, [categoryData, cookies]);
 
   const fetchCategories = async () => {
     try {

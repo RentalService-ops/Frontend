@@ -66,7 +66,7 @@ export default function Equipments() {
         }
 
         fetchEquipmentData();
-    }, [cookie]);
+    }, [equipmentData, cookie.jwtToken]);
 
     const fetchImages = async (data) => {
         const imageMap = {};

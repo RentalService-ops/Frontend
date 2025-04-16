@@ -32,7 +32,7 @@ export default function RentalBookingHistory() {
     }
     fetchBookings();
     return () => controller.abort();
-  }, [cookies.jwtToken]);
+  }, [bookings,cookies.jwtToken]);
 
   const statusOptions = ["APPROVED", "CANCELLED", "REJECTED"];
 

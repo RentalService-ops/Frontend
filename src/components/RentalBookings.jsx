@@ -35,7 +35,7 @@ export default function RentalBookings() {
     }
     fetchBookings();
     return () => controller.abort();
-  }, [cookies.jwtToken]);
+  }, [bookings, cookies.jwtToken]);
 
   async function handleApprove(id) {
     try {
