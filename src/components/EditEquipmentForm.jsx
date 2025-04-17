@@ -1,11 +1,7 @@
 import { Modal, Button } from "react-bootstrap";
-import {useEffect, useState} from "react"
-export default function EditEquipmentForm({showEditModal,handleSaveEdit,equipment,setShowEditModal}) {
-  const [editedEquipment, setEditedEquipment] = useState({});
 
-  useEffect(()=>{
-    setEditedEquipment(equipment);
-  },[equipment])
+export default function EditEquipmentForm({showEditModal,handleSaveEdit,setEditedEquipment,setShowEditModal,editedEquipment}) {
+
   
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -71,7 +67,7 @@ export default function EditEquipmentForm({showEditModal,handleSaveEdit,equipmen
 
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="success" onClick={()=>handleSaveEdit(editedEquipment)}>Save</Button>
+        <Button variant="success" onClick={()=>handleSaveEdit()}>Save</Button>
       </Modal.Footer>
     </Modal>
   )

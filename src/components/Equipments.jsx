@@ -12,6 +12,7 @@ export default function Equipments() {
     const [equipmentData, setEquipmentData] = useState([]);
     const [imageUrls, setImageUrls] = useState({});
     const [showAddEquipment, setShowAddEquipment] = useState(false);
+    const [editedEquipment,setEditedEquipment] = useState({});
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -23,6 +24,7 @@ export default function Equipments() {
     const [selectedEquipment, setSelectedEquipment] = useState(null);
 
     const tableData = [
+        
         {
             label: "Image",
             render: (equipment) => (<img src={imageUrls[equipment.imageUrl] || "/defaultImage.png"} alt="equipment" style={{ width: "50px", height: "50px" }} />)
@@ -106,9 +108,10 @@ export default function Equipments() {
     const handleEdit = () => {
         setShowDetailModal(false);
         setShowEditModal(true);
+        setEditedEquipment({...selectedEquipment, imagePreview: imageUrls[selectedEquipment.imageUrl] || "/defaultImage.png", imageFile: null });
     };
 
-    const handleSaveEdit = async (editedEquipment) => {
+    const handleSaveEdit = async () => {
         if (!editedEquipment.equipmentId) {
             alert("Equipment ID is missing.");
             return;
@@ -200,7 +203,7 @@ export default function Equipments() {
                         </Modal.Footer>
                     </Modal>
 
-                    <EditEquipmentForm equipment={{ ...selectedEquipment, imagePreview: imageUrls[selectedEquipment?.imageUrl] || "/defaultImage.png" }} showEditModal={showEditModal} handleSaveEdit={handleSaveEdit} setShowEditModal={setShowEditModal} />
+                    <EditEquipmentForm editedEquipment={editedEquipment} setEditedEquipment={setEditedEquipment} showEditModal={showEditModal} handleSaveEdit={handleSaveEdit} setShowEditModal={setShowEditModal} />
                 </>
             ) : (
                 <AddEquipment setShowAddEquipment={setShowAddEquipment} />

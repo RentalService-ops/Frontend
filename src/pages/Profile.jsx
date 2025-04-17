@@ -123,7 +123,7 @@ export default function ProfilePage() {
   <Card className="mb-4 text-center shadow">
     <Card.Body>
       <Card.Img
-        src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+        src="https://img.freepik.com/premium-psd/smiling-3d-cartoon-man_975163-772.jpg?semt=ais_hybrid&w=740"
         alt="User Avatar"
         className="rounded-circle"
         style={{ width: "150px" }}

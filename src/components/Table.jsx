@@ -1,30 +1,46 @@
-export default function Table({ bookings, config, keyFn }) {
 
+export default function Table({ bookings, config, keyFn }) {
     return (
-        <div className="table-responsive flex-grow-1">
-            { bookings.length > 0 ?
-            <table className="table table-striped table-bordered table-hover">
-                <thead className="table-dark">
-                    <tr>
-                        <th>#</th>
-                        {config.map((value) => (
-                            <th key={value.label} className="p-3 text-center">{value.label}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {bookings.map((value1,index) => (
-                        <tr key={keyFn(value1)}>
-                            <td>{index+1}</td>
-                            {config.map((eachValue) => (
-                                <td key={eachValue.label} className="p-3 text-center">{eachValue.render(value1)}</td>
+        <div className="flex-grow-1 p-3">
+            {bookings.length > 0 ? (
+                <div className="table-responsive shadow rounded-3 border">
+                    <table className="table table-striped table-bordered table-hover align-middle mb-0">
+                        <thead className="table-dark">
+                            <tr>
+                                {config.map((value) => (
+                                    <th
+                                        key={value.label}
+                                        className="text-center"
+                                        style={{ padding: "1rem", fontWeight: "600", fontSize: "1rem" }}
+                                    >
+                                        {value.label}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {bookings.map((booking, index) => (
+                                <tr key={keyFn(booking)} className="text-center">
+                                    {config.map((col) => (
+                                        <td
+                                            key={col.label}
+                                            style={{
+                                                padding: "1rem",
+                                                verticalAlign: "middle",
+                                                fontSize: "0.95rem",
+                                            }}
+                                        >
+                                            {col.render(booking, index)}
+                                        </td>
+                                    ))}
+                                </tr>
                             ))}
-                        </tr>
-                    )) }
-                </tbody>
-            </table>    
-                : <div>No Data available...</div>}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <div className="alert alert-info text-center mt-4">No data at the moment.</div>
+            )}
         </div>
     );
-  }
-  
+}

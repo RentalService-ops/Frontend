@@ -54,7 +54,7 @@ const UserDashboard = ({ isSidebarOpen }) => {
     };
 
     fetchProducts();
-  }, [products,cookies.jwtToken]);
+  }, [cookies.jwtToken]);
 
   const fetchImages = async (data) => {
     const imageMap = {};
@@ -85,13 +85,15 @@ const UserDashboard = ({ isSidebarOpen }) => {
   };
 
   function handleFilter(category) {
+    console.log("Selected Category:", category); // Log the selected category
     setSelectedCategory(category);
     const newFilteredProducts =
       category === "All Categories"
         ? products
-        : products.filter((product) => product.categoryName === category);
+        : products.filter((product) => product.categoryName.toLowerCase() === category.toLowerCase()); // Case-insensitive matching
+    console.log("Filtered Products:", newFilteredProducts); // Log filtered products
     setFilteredProducts(newFilteredProducts);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to first page after applying filter
   }
 
   const handleSearch = (e) => {
@@ -118,12 +120,10 @@ const UserDashboard = ({ isSidebarOpen }) => {
       }}
     >
       <div className="container-fluid p-4">
-       
-
         {/* Filters */}
         <div className="d-flex justify-content-between mb-4">
           <div className="w-50 pe-3">
-            <h5 className="text-info"> Search Products</h5>
+            <h5 className="text-info">Search Products</h5>
             <input
               type="text"
               className="form-control border border-primary shadow-sm"
@@ -133,7 +133,7 @@ const UserDashboard = ({ isSidebarOpen }) => {
             />
           </div>
           <div className="w-45">
-            <h5 className="text-success"> Filter by Category</h5>
+            <h5 className="text-success">Filter by Category</h5>
             <select
               className="form-select border border-success shadow-sm"
               onChange={(e) => handleFilter(e.target.value)}

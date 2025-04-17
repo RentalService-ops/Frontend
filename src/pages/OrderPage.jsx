@@ -24,7 +24,7 @@ const OrderPage = ({ isSidebarOpen }) => {
     localStorage.setItem("failedPaymentAttempts", 0);
   },[]);
 
-  const loadRazorpayScript = () => {
+  const loadRazorpayScript = () => {//displays the Razorpay UI for payment.
     return new Promise((resolve) => {
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -142,7 +142,8 @@ const OrderPage = ({ isSidebarOpen }) => {
     {
       label: "Sr No.",
       render: (order, index) => (currentPage - 1) * ordersPerPage + index + 1,
-    },
+    }
+    ,
     {
       label: "Equipment Name",
       render: (order) => order.equipmentName,
@@ -210,7 +211,7 @@ const OrderPage = ({ isSidebarOpen }) => {
 
   useEffect(() => {
     fetchOrders();
-  }, [orders,cookies]);
+  }, [cookies]);
 
   const fetchOrders = async () => {
     try {

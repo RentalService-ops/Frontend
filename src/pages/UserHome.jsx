@@ -5,6 +5,7 @@ import { FaHome } from "react-icons/fa";
 import { IoAddCircleOutline } from "react-icons/io5";
 import Sidebar from "../layout/SideBar";
 import NotificationPage from "../components/NotificationPage";
+import PaymentPage from "../components/PaymentPage";
 
 export default function UserHome({isSidebarOpen}) {
   const [activeLink, setActiveLink] = useState(localStorage.getItem("state") || "Home");
@@ -15,8 +16,10 @@ export default function UserHome({isSidebarOpen}) {
         return <UserDashboard />;
       case "My Orders":
         return <OrderPage />;
-        case "Notification":
+      case "Notification":
         return <NotificationPage />;
+      case "Payment":
+        return <PaymentPage />;
       default:
         return <UserDashboard />;
     }
@@ -26,6 +29,7 @@ export default function UserHome({isSidebarOpen}) {
     { label: "Home", displayButton: <FaHome /> },
     { label: "My Orders", displayButton: <IoAddCircleOutline /> },
     { label: "Notification", displayButton: <IoAddCircleOutline /> },
+    { label: "Payment", displayButton: <IoAddCircleOutline /> },
 
   ];
 

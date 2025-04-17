@@ -34,7 +34,7 @@ export default function RentalBookingHistory() {
     return () => controller.abort();
   }, [bookings,cookies.jwtToken]);
 
-  const statusOptions = ["APPROVED", "CANCELLED", "REJECTED"];
+  const statusOptions = ["APPROVED", "CANCELLED", "REJECTED","COMPLETED"];
 
   const filteredBookings = bookings.filter((booking) => booking.status === activeTab);
 
@@ -62,7 +62,11 @@ export default function RentalBookingHistory() {
               ? "bg-success"
               : booking.status === "REJECTED"
               ? "bg-danger"
+              : booking.status === "COMPLETED"
+              ? "bg-success"
               : "bg-secondary"
+
+              
           }`}
         >
           {booking.status}
