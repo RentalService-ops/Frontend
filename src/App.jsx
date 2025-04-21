@@ -3,10 +3,11 @@ import { jwtDecode } from "jwt-decode";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import RentalHome from "./pages/RentalHome";
-import AdminLayout from "./components/admin/AdminLayout";
+import AdminLayout from "./pages/AdminLayout";
 import AdminUsers from "./components/admin/AdminUsers";
 import AdminEquipment from "./components/admin/AdminEquipment";
 import AdminBookings from "./components/admin/AdminBookings";
+import AdminDashboard from "./components/admin/AdminDashboard";
 import AdminQueries from "./components/admin/AdminQueries";
 import AdminCategory from "./components/admin/AdminCategory";
 import UserHome from "./pages/UserHome";
@@ -60,6 +61,7 @@ function App() {
 
             <Route path="/" element={isAuthenticated ? <Navigate to={getHomeRoute()} /> : <Dashboard />} />
             <Route path="/admin/*" element={isAuthenticated && cookies?.role === "admin" ? <AdminLayout /> : <Navigate to="/login" />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="equipments" element={<AdminEquipment />} />
             <Route path="bookings" element={<AdminBookings />} />

@@ -1,47 +1,80 @@
-import { useState } from "react";
+/* eslint-disable react/no-unknown-property */
 import { NavLink } from "react-router-dom";
-import { Home, Users, Package, ClipboardList, MessageCircle, Menu, Folder } from "lucide-react";
+import { Nav, Button } from "react-bootstrap";
+import { 
+  Home, 
+  Users, 
+  Package, 
+  ClipboardList, 
+  MessageCircle, 
+  ChevronLeft, 
+  ChevronRight, 
+  Folder,
+} from "lucide-react";
 
-const AdminSidebar = () => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
+const AdminSidebar = ({ isExpanded, setIsExpanded }) => {
+  // Menu items configuration
+  const menuItems = [
+    { to: "/admin/dashboard", label: "Dashboard", icon: <Home size={20} /> },
+    { to: "/admin/users", label: "Users", icon: <Users size={20} /> },
+    { to: "/admin/equipments", label: "Equipments", icon: <Package size={20} /> },
+    { to: "/admin/bookings", label: "Bookings", icon: <ClipboardList size={20} /> },
+    { to: "/admin/queries", label: "Queries", icon: <MessageCircle size={20} /> },
+    { to: "/admin/categories", label: "Categories", icon: <Folder size={20} /> },
+  ];
 
-    return (
-        <div className={`bg-light text-dark d-flex flex-column transition-all ${isCollapsed ? "collapsed" : "expanded"}`}>
-            {/* Toggle Button */}
-            <div className="d-flex justify-content-end p-2">
-                <button 
-                    onClick={() => setIsCollapsed(!isCollapsed)} 
-                    className="btn btn-outline-secondary"
-                >
-                    <Menu size={20} />
-                </button>
-            </div>
 
-            {/* Sidebar Navigation */}
-            <nav className="nav flex-column px-2">
-                {[
-                    { to: "/admin/dashboard", label: "Dashboard", icon: <Home size={20} /> },
-                    { to: "/admin/users", label: "Users", icon: <Users size={20} /> },
-                    { to: "/admin/equipments", label: "Equipments", icon: <Package size={20} /> },
-                    { to: "/admin/bookings", label: "Bookings", icon: <ClipboardList size={20} /> },
-                    { to: "/admin/queries", label: "Queries", icon: <MessageCircle size={20} /> },
-                    { to: "/admin/categories", label: "Categories", icon: <Folder size={20} /> } 
-                ].map((item, index) => (
-                    <NavLink
-                        key={index}
-                        to={item.to}
-                        className={({ isActive }) =>
-                            `nav-link d-flex align-items-center py-2 px-3 rounded ${isActive ? "bg-secondary text-white fw-bold" : "text-dark"}`
-                        }
-                    >
-                        <span className="me-2">{item.icon}</span>
-                        <span className={`link-text ${isCollapsed ? "d-none" : ""}`}>{item.label}</span>
-                    </NavLink>
-                ))}
-            </nav>
-        </div>
-    );
+  //Sidebar
+  const DesktopSidebar = () => (
+    <div 
+      className="bg-dark text-light h-100 d-flex flex-column transition-all shadow"
+      style={{ 
+        width: isExpanded ? "100%" : "4rem",
+        transition: "width 0.3s ease-in-out",
+        overflowX: "hidden" 
+      }}
+    >
+      {/* Header/Logo Area */}
+      <div className="p-3 d-flex justify-content-between align-items-center border-bottom border-secondary">
+        {isExpanded && <h5 className="m-0 text-light">Admin Panel</h5>}
+        <Button 
+          variant="outline-light" 
+          size="sm"
+          className="border-2"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+        </Button>
+      </div>
+
+      {/* Nav Items */}
+      <Nav className="flex-column mt-3 w-100 sidebar-nav">
+        {menuItems.map((item, index) => (
+          <NavLink
+            key={index}
+            to={item.to}
+            className={({ isActive }) => 
+              `nav-link py-2 px-3 mb-2 mx-2 d-flex align-items-center rounded transition-all ${
+                isActive ? "bg-primary text-white" : "text-light"
+              } ${isExpanded ? "justify-content-start" : "justify-content-center"} sidebar-link`
+            }
+          >
+            <span>{item.icon}</span>
+            {isExpanded && <span className="ms-3">{item.label}</span>}
+          </NavLink>
+        ))}
+      </Nav>
+
+      {/* CSS for hover effect */}
+      <style jsx>{`
+        .sidebar-link:not(.bg-primary):hover {
+          background-color: rgba(204, 197, 197, 0.78);
+          transform: translateX(3px);
+        }
+      `}</style>
+    </div>
+  );
+  return <DesktopSidebar />;
 };
 
 export default AdminSidebar;
-

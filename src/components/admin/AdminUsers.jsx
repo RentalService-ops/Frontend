@@ -1,28 +1,32 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Trash2 } from "lucide-react";
+import { Card, Row, Col, Container, Badge, Button } from "react-bootstrap";
+import { Trash2, Users as UsersIcon } from "lucide-react";
 import { useCookies } from "react-cookie";
-import AdminPagination from "./AdminPagination";
+import AdminDataTable from "./AdminDataTable";
+import Pagination from "../../layout/Pagination";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1); 
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [cookie] = useCookies();
   const [error, setError] = useState(null);
-  const [allUsersCount, setAllUsersCount] = useState(0);
-  const [totalUsersCount, setTotalUsersCount] = useState(0);
-  const [totalRentersCount, setTotalRentersCount] = useState(0);
-  const [totalAdminsCount, setTotalAdminsCount] = useState(0);
+  const [stats, setStats] = useState({
+    allUsers: 0,
+    totalUsers: 0,
+    totalRenters: 0,
+    totalAdmins: 0
+  });
 
-  const productsPerPage = 4;
+  const productsPerPage = 6;
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       fetchUsers();
-    }, 100);
+    }, 300);
 
     return () => clearTimeout(debounceTimer);
   }, [page, search]);
@@ -31,27 +35,28 @@ const AdminUsers = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/admin/users?page=${page}&size=${productsPerPage}&sortBy=id&direction=asc&search=${search}`,
+        `http://localhost:8080/api/admin/users?page=${page - 1}&size=${productsPerPage}&sortBy=id&direction=asc&search=${search}`,
         {
           headers: { Authorization: `Bearer ${cookie.jwtToken}` },
         }
       );
       setUsers(response.data.content);
       setTotalPages(response.data.totalPages);
-  
-      const allUsers = response.data.content;
-      setAllUsersCount(response.data.totalItems); // use actual total count from backend
-      setTotalUsersCount(allUsers.filter((u) => u.role === "user").length);
-      setTotalRentersCount(allUsers.filter((u) => u.role === "rental").length);
-      setTotalAdminsCount(allUsers.filter((u) => u.role === "admin").length);
+
+      // Update statistics
+      setStats({
+        allUsers: response.data.totalItems,
+        totalUsers: response.data.content.filter(u => u.role === "user").length,
+        totalRenters: response.data.content.filter(u => u.role === "rental").length,
+        totalAdmins: response.data.content.filter(u => u.role === "admin").length
+      });
     } catch (error) {
-      setError("Error fetching users");
+      setError("Error fetching users. Please try again.");
       console.error("Error fetching users", error);
     } finally {
       setLoading(false);
     }
   };
-  
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
@@ -59,111 +64,102 @@ const AdminUsers = () => {
         await axios.delete(`http://localhost:8080/api/admin/users/${id}`, {
           headers: { Authorization: `Bearer ${cookie.jwtToken}` },
         });
-        alert("User deleted successfully!");
         fetchUsers();
       } catch (error) {
         setError("Error deleting user");
         console.error("Error deleting user", error);
-        alert("Failed to delete the user.");
       }
     }
   };
 
-  return (
-    <div className="m-4 p-6 w-full"> {/* Removed ml-64 and fixed width */}
+  // Table column definitions
+  const columns = [
+    { header: "ID", accessor: "id" },
+    { header: "Name", accessor: "username" },
+    { header: "Email", accessor: "email" },
+    { header: "Phone", accessor: "phoneNumber" },
+    { 
+      header: "Role", 
+      accessor: "role",
+      render: (user) => {
+        let badgeColor = "secondary";
+        if (user.role === "admin") badgeColor = "danger";
+        else if (user.role === "rental") badgeColor = "success";
+        else if (user.role === "user") badgeColor = "primary";
 
-      <h2 className="text-2xl font-semibold mb-4">Manage Users</h2>
-      <div className="flex gap-6 mb-4 text-sm text-gray-700">
-        <p className="bg-gray-100 px-4 py-2 rounded shadow">
-          <strong>All Users:</strong> {allUsersCount}
-        </p>
-        <p className="bg-gray-100 px-4 py-2 rounded shadow">
-          <strong>Total Users:</strong> {totalUsersCount}
-        </p>
-        <p className="bg-gray-100 px-4 py-2 rounded shadow">
-          <strong>Total Renters:</strong> {totalRentersCount}
-        </p>
-        <p className="bg-gray-100 px-4 py-2 rounded shadow">
-          <strong>Total Admins:</strong> {totalAdminsCount}
-        </p>
+        return <Badge bg={badgeColor}>{user.role}</Badge>;
+      }
+    },
+  ];
+
+  // Actions renderer
+  const renderActions = (user) => (
+    <Button
+      variant="outline-danger"
+      size="sm"
+      onClick={() => handleDelete(user.id)}
+      className="d-flex align-items-center mx-auto"
+    >
+      <Trash2 size={16} className="me-1" /> Delete
+    </Button>
+  );
+
+  return (
+    <Container fluid>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="mb-0">User Management</h2>
       </div>
-      <input
-        type="text"
-        placeholder="Search Users..."
-        className="border p-2 rounded w-full mb-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
+
+      {/* Statistics Cards */}
+      <Row className="g-3 mb-4">
+        {[
+          { title: "All Users", value: stats.allUsers, icon: <UsersIcon size={24} />, color: "primary" },
+          { title: "Customers", value: stats.totalUsers, icon: <UsersIcon size={24} />, color: "success" },
+          { title: "Renters", value: stats.totalRenters, icon: <UsersIcon size={24} />, color: "warning" },
+          { title: "Admins", value: stats.totalAdmins, icon: <UsersIcon size={24} />, color: "danger" }
+        ].map((stat, index) => (
+          <Col key={index} md={3} sm={6}>
+            <Card className={`border-${stat.color} h-100 shadow-sm`}>
+              <Card.Body className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 className="text-muted mb-1">{stat.title}</h6>
+                  <h3 className="mb-0">{stat.value}</h3>
+                </div>
+                <div className={`bg-${stat.color} bg-opacity-10 p-3 rounded`}>
+                  {stat.icon}
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+
+      {/* User Table */}
+      <AdminDataTable
+        columns={columns}
+        data={users}
+        loading={loading}
+        error={error}
+        emptyMessage="No users found."
+        loadingMessage="Loading users..."
+        // searchPlaceholder="Search users by name, email or role..."
+        searchPlaceholder="Search users by name..."
+        search={search}
+        setSearch={setSearch}
+        renderActions={renderActions}
       />
 
-
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border rounded-lg shadow-md">
-          <thead>
-            <tr className="bg-gray-100 text-left">
-              <th className="p-3 border">ID</th>
-              <th className="p-3 border">Name</th>
-              <th className="p-3 border">Email</th>
-              <th className="p-3 border">Phone Number</th>
-              {/* <th className="p-3 border">Address</th> */}
-              <th className="p-3 border">Role</th>
-              <th className="p-3 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="7" className="p-4 text-center text-gray-500">
-                  Loading users...
-                </td>
-              </tr>
-            ) : users.length > 0 ? (
-              users.map((user) => (
-                <tr key={user.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 border">{user.id}</td>
-                  <td className="p-3 border">{user.username}</td>
-                  <td className="p-3 border">{user.email}</td>
-                  <td className="p-3 border">{user.phoneNumber}</td>
-                  {/* <td className="p-3 border">{user.address}</td> */}
-                  <td className="p-3 border">{user.role}</td>
-                  <td className="p-3 border flex space-x-4">
-                    <button
-                      className="flex items-center text-red-500 hover:text-red-700 transition"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      <Trash2 size={18} className="mr-1" /> Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="p-4 text-center text-gray-500">
-                  No users found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-          <span className="block sm:inline">{error}</span>
-        </div>
-      )}
-
-      
-      {/* Pagination Component */}
-      <div className="m-5">
-        <AdminPagination
-          totalPages={totalPages}
-          currentPage={page}
-          setCurrentPage={setPage}
-        />
-      </div>
-
-    </div>
+      {/* Custom Pagination Component */}
+      <Pagination 
+        data={users}
+        currentPage={page}
+        setCurrentPage={setPage}
+        productsPerPage={productsPerPage}
+        totalPages={totalPages}
+      />
+    </Container>
   );
 };
 
 export default AdminUsers;
+

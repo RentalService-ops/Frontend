@@ -22,7 +22,7 @@ const Sidebar = ({ activeLink, setActiveLink, linkData, isOpen }) => {
         minWidth: "280px",
         height: "100vh",
         left: isOpen ? "0px" : "-280px", // Hide sidebar by shifting it left
-        transition: "left 0.3s ease-in-out", // Smooth transition
+        transition: "left 0.5s ease-in-out", // Smooth transition
         zIndex: 1050, // Ensure it's above other elements
       }}
     >

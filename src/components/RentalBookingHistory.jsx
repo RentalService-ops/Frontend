@@ -26,13 +26,14 @@ export default function RentalBookingHistory() {
           signal: controller.signal,
         });
         setBookings(response.data);
+        // console.log(response.data)
       } catch (err) {
         console.error(err);
       }
     }
     fetchBookings();
     return () => controller.abort();
-  }, [bookings,cookies.jwtToken]);
+  }, []);
 
   const statusOptions = ["APPROVED", "CANCELLED", "REJECTED","COMPLETED"];
 
