@@ -14,7 +14,7 @@ const RentalHome = ({isSidebarOpen}) => {
   const [activeLink,setActiveLink]=useState(localStorage.getItem("state") || "Home");
   function returnComponent(){
     if(activeLink==="Home"){
-      return <RentalDashboard />
+      return <RentalDashboard setActiveLink={setActiveLink} />
     }
     else if(activeLink==="My Categories"){
       return <Categories />

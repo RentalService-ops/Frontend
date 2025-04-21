@@ -1,5 +1,5 @@
 
-export default function Table({ bookings, config, keyFn }) {
+export default function Table({ bookings, config ,keyFn }) {
     return (
         <div className="flex-grow-1 p-3">
             {bookings.length > 0 ? (
@@ -20,7 +20,7 @@ export default function Table({ bookings, config, keyFn }) {
                         </thead>
                         <tbody>
                             {bookings.map((booking, index) => (
-                                <tr key={keyFn(booking)} className="text-center">
+                                <tr key={index} className="text-center">
                                     {config.map((col) => (
                                         <td
                                             key={col.label}

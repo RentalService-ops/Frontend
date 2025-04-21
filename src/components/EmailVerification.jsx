@@ -41,14 +41,13 @@ export default function EmailVerification() {
     return (
         <>
             <div style={{
-                height: "100vh",
+                height: "83vh",
                 width: "100vw",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: "#f8f9fa"
             }}>
-                <div className="card shadow p-4" style={{ maxWidth: "400px", width: "100%", borderRadius: "15px" }}>
+                <div className="card shadow p-4" style={{ minWidth: "400px", borderRadius: "15px" ,top:"50px"}}>
                     <h4 className="text-center mb-4">Email Verification</h4>
                     <div className="form-group mb-3">
                         <label htmlFor="emailInput" className="form-label">Email Address</label>

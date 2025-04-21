@@ -82,6 +82,7 @@ const UserDashboard = ({ isSidebarOpen }) => {
 
   const handleCloseModal = () => {
     setShowModal(false);
+    setSelectedProduct(null);
   };
 
   function handleFilter(category) {

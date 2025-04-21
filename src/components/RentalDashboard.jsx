@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import { useCookies } from "react-cookie";
 import Equipments from "./Equipments"; // 👈 Assuming this is your detailed view component
 
-const RentalDashboard = () => {
+const RentalDashboard = (props) => {
   const [cookies] = useCookies(["jwtToken"]);
   const [categoryCount, setCategoryCount] = useState(0);
   const [equipmentList, setEquipmentList] = useState([]);
@@ -119,7 +119,11 @@ const RentalDashboard = () => {
           <h5 className="mb-0">Your Equipments</h5>
           <button
             className="btn btn-sm btn-outline-primary"
-            onClick={() => setShowAllEquipments(true)} // 👈 Toggle detailed view
+            onClick={() => {setShowAllEquipments(true)
+              localStorage.setItem("state", "My Equipments");
+              props.setActiveLink("My Equipments")
+            }
+            } 
           >
             View All
           </button>

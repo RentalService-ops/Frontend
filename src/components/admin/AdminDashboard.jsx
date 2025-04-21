@@ -36,19 +36,20 @@ const AdminDashboard = () => {
       );
       
       const bookingsResponse = await axios.get(
-        "http://localhost:8080/api/admin/bookings?page=0&size=5",
+        "http://localhost:8080/api/admin/getAllBookings",
         { headers: { Authorization: `Bearer ${cookie.jwtToken}` } }
       );
+      
       
       // Update stats with real data
       setStats(prev => ({
         ...prev,
         users: { ...prev.users, total: userResponse.data.totalItems || 0 },
-        bookings: { ...prev.bookings, total: bookingsResponse.data.totalElements || 0 }
+        bookings: { ...prev.bookings, total: bookingsResponse.data.totalBookings || 0 }
       }));
       
       // Set recent bookings
-      setRecentBookings(bookingsResponse.data.content || []);
+      setRecentBookings(bookingsResponse.data.recentbookings || []);
       
     } catch (error) {
       console.error("Error fetching dashboard data", error);
@@ -193,16 +194,16 @@ const AdminDashboard = () => {
                         </td>
                       </tr>
                     ) : recentBookings.length > 0 ? (
-                      recentBookings.map((booking) => (
+                      recentBookings.map((booking,index) => (
                         <tr key={booking.bookingId}>
-                          <td>#{booking.bookingId}</td>
+                          <td>{index+1}</td>
                           <td>{booking.equipmentName}</td>
                           <td>{booking.userName}</td>
                           <td>
-                            <span className={`badge bg-${
-                              booking.status === "APPROVED" ? "success" :
-                              booking.status === "PENDING" ? "warning" : "danger"
-                            }`}>
+                            <span className={`badge rounded-pill bg-${booking.status === 'APPROVED' ? 'success' 
+                              : booking.status === 'PENDING' ? 'warning' 
+                              : booking.status=== 'CANCELLED' ? 'danger' 
+                            : booking.status === 'COMPLETED' ? 'primary' : 'secondary'}`}>
                               {booking.status}
                             </span>
                           </td>

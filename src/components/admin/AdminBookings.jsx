@@ -4,25 +4,36 @@ import { useCookies } from "react-cookie";
 import { 
   Container, 
   Card, 
-  Table, 
   Badge, 
-  Form, 
-  InputGroup, 
-  Spinner, 
+  Spinner,
   Alert 
 } from "react-bootstrap";
 import Pagination from "../../layout/Pagination"; 
+import Table from "../Table";
 
 const AdminBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1); 
   const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("Renter");
   const [error, setError] = useState(null);
   const [cookie] = useCookies();
 
   const productsPerPage = 5;
+  const config=[
+    {
+      label: "Sr No.",
+      render: (_booking, index) => index + 1,
+    },
+    {label:"Name",render:(booking)=>booking.name},
+    {label:"Total Bookings",render:(booking)=>booking.totalBookings},
+    {label:"Approved Bookings",render:(booking)=>booking.approvedBookings},
+    {label:"Pending Bookings",render:(booking)=>booking.pendingBookings},
+    {label:"Rejected Bookings",render:(booking)=>booking.rejectedBookings},
+    {label:"Cancelled Bookings",render:(booking)=>booking.cancelledBookings},
+    {label:"Completed Bookings",render:(booking)=>booking.completedBookings}
+  ]
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -42,7 +53,8 @@ const AdminBookings = () => {
           headers: { Authorization: `Bearer ${cookie.jwtToken}` },
         }
       );
-      setBookings(response.data.content);
+      console.log(response.data.content);
+      setBookings(response.data.content.content);                                                    
       setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching bookings", error);
@@ -78,17 +90,11 @@ const AdminBookings = () => {
       {/* Search Bar and Table Container */}
       <Card className="shadow-sm">
         <Card.Body>
-          {/* Search Bar similar to AdminDataTable */}
-          <div className="mb-4 border border-primary border-1">
-            <InputGroup>
-              <Form.Control
-                type="text"
-                placeholder="Search bookings..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </InputGroup>
-          </div>
+        <div className="d-flex gap-3">
+          <button className="btn btn-primary" onClick={() => setSearch("Renter")}> Renter </button>
+          <button className="btn btn-primary" onClick={() => setSearch("Equipment")}> Equipment </button>
+          <button className="btn btn-primary" onClick={() => setSearch("User")}> User </button>
+        </div>
 
           {/* Error Alert */}
           {error && (
@@ -97,52 +103,7 @@ const AdminBookings = () => {
             </Alert>
           )}
 
-          {/* Bookings Table */}
-          <div className="table-responsive">
-            <Table hover striped bordered>
-              <thead className="table-dark">
-                <tr>
-                  <th>Booking ID</th>
-                  <th>Quantity</th>
-                  <th>Owner</th>
-                  <th>Customer</th>
-                  <th>Equipment Name</th>
-                  <th>Owner&apos;s Total Bookings</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="7" className="text-center py-4">
-                      <Spinner animation="border" role="status" variant="primary">
-                        <span className="visually-hidden">Loading...</span>
-                      </Spinner>
-                      <p className="mt-2">Loading booking data...</p>
-                    </td>
-                  </tr>
-                ) : bookings.length > 0 ? (
-                  bookings.map((booking) => (
-                    <tr key={booking.bookingId}>
-                      <td>{booking.bookingId}</td>
-                      <td>{booking.equipmentQuantity}</td>
-                      <td>{booking.renterName}</td>
-                      <td>{booking.userName}</td>
-                      <td>{booking.equipmentName}</td>
-                      <td>{booking.totalBookingsByRenter}</td>
-                      <td className="text-center">{getStatusBadge(booking.status)}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="7" className="text-center py-3">
-                      No bookings found matching your search criteria.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </div>
+          {loading ?<Spinner /> :<Table config={config} bookings={bookings}/>}
 
           {/* Custom Pagination Component */}
           <Pagination 
