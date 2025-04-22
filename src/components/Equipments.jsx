@@ -7,6 +7,7 @@ import Pagination from "../layout/Pagination";
 import { Modal, Button } from "react-bootstrap";
 import EditEquipmentForm from "./EditEquipmentForm";
 import Table from "./Table"
+import _ from 'lodash';
 export default function Equipments() {
     const [cookie] = useCookies();
     const [equipmentData, setEquipmentData] = useState([]);
@@ -59,9 +60,10 @@ export default function Equipments() {
                     params: { id: `${jwtDecode(cookie.jwtToken).user_id}` },
                     withCredentials: true
                 });
-
+                if(!_.isEqual(response.data,equipmentData)){
                 setEquipmentData(response.data);
                 fetchImages(response.data);
+                }
             } catch (err) {
                 console.error("Error fetching equipment:", err);
             }
@@ -190,7 +192,7 @@ export default function Equipments() {
                                     </div>
                                     <div>
                                         <p><strong>Name:</strong> {selectedEquipment.name}</p>
-                                        <p><strong>Price Per Day:</strong> ${selectedEquipment.pricePerDay}</p>
+                                        <p><strong>Price Per Day:</strong> Rs.{selectedEquipment.pricePerDay}</p>
                                         <p><strong>Quantity:</strong> {selectedEquipment.quantity}</p>
                                         <p><strong>Description:</strong> {selectedEquipment.description}</p>
                                     </div>

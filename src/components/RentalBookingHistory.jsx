@@ -4,6 +4,7 @@ import { useCookies } from "react-cookie";
 import Table from "./Table";
 import Pagination from "../layout/Pagination";
 import { useState, useEffect } from "react";
+import _ from 'lodash';
 
 export default function RentalBookingHistory() {
   const [bookings, setBookings] = useState([]);
@@ -25,15 +26,16 @@ export default function RentalBookingHistory() {
           },
           signal: controller.signal,
         });
+        if(!_.isEqual(bookings,response.data)){
         setBookings(response.data);
-        // console.log(response.data)
+        }
       } catch (err) {
         console.error(err);
       }
     }
     fetchBookings();
     return () => controller.abort();
-  }, []);
+  }, [bookings]);
 
   const statusOptions = ["APPROVED", "CANCELLED", "REJECTED","COMPLETED"];
 

@@ -4,12 +4,12 @@ import { useCookies } from "react-cookie";
 import {Container,Row,Col,Card,Table,Badge,Button,Form,InputGroup,Spinner,Alert} from "react-bootstrap";
 import { CheckCircle } from "lucide-react";
 import Pagination from "../../layout/Pagination";
+import _ from 'lodash';
 
 const AdminQueries = () => {
   const [queries, setQueries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
   const [resolvingQuery, setResolvingQuery] = useState(null);
   const [cookie] = useCookies();
   const [error, setError] = useState(null);
@@ -25,7 +25,7 @@ const AdminQueries = () => {
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [search,queries]);
+  }, [queries]);
 
   const fetchQueries = async () => {
     setLoading(true);
@@ -38,11 +38,11 @@ const AdminQueries = () => {
           }
         }
       );
-
+      if(!_.isEqual(response.data,queries)){
       setQueries(response.data);
-
       const total = response.data;
       setTotalQueries(total.length);
+      }
     } catch (error) {
       setError(error.message || "Failed to fetch queries");
     }
@@ -118,16 +118,6 @@ const AdminQueries = () => {
 
       <Card className="shadow-sm">
         <Card.Body>
-          <div className="mb-4 border border-primary border-1">
-            <InputGroup>
-              <Form.Control
-                type="text"
-                placeholder="Search queries..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </InputGroup>
-          </div>
 
           {error && (
             <Alert variant="danger" onClose={() => setError(null)} dismissible>

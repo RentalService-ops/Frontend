@@ -5,6 +5,7 @@ import Table from "./Table";
 import { useState, useEffect } from "react";
 import ConfirmationModal from "./ConfirmationModal";
 import Pagination from "../layout/Pagination";
+import _ from 'lodash';
 
 export default function RentalBookings() {
   const [bookings, setBookings] = useState([]);
@@ -28,7 +29,9 @@ export default function RentalBookings() {
           },
           signal: controller.signal,
         });
+        if(!_.isEqual(response.data,bookings)){
         setBookings(response.data);
+        }
       } catch (err) {
         console.error(err);
       }

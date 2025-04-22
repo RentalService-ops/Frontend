@@ -4,6 +4,7 @@ import { useCookies } from "react-cookie";
 import { Card, Button } from "react-bootstrap";
 import ProductModal from "./ProductModal";
 import Pagination from "../layout/Pagination";
+import _ from 'lodash';
 
 const UserDashboard = ({ isSidebarOpen }) => {
   const [cookies] = useCookies(["jwtToken"]);
@@ -30,14 +31,16 @@ const UserDashboard = ({ isSidebarOpen }) => {
         const response = await axios.get("http://localhost:8080/api/category/getAllCategory", {
           headers: { Authorization: `Bearer ${cookies.jwtToken}` },
         });
+        if(!_.isEqual(response.data.body,categories)){
         setCategories(response.data.body);
+        }
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
 
     fetchCategories();
-  }, [cookies.jwtToken]);
+  }, [cookies.jwtToken,categories]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -45,16 +48,18 @@ const UserDashboard = ({ isSidebarOpen }) => {
         const response = await axios.get("http://localhost:8080/api/equipment/getAllEquipments", {
           headers: { Authorization: `Bearer ${cookies.jwtToken}` },
         });
+        if(!_.isEqual(response.data,products)){
         setProducts(response.data);
         setFilteredProducts(response.data);
         fetchImages(response.data);
+        }
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
 
     fetchProducts();
-  }, [cookies.jwtToken]);
+  }, [cookies.jwtToken,products]);
 
   const fetchImages = async (data) => {
     const imageMap = {};

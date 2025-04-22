@@ -44,6 +44,7 @@ const AdminEquipment = () => {
           },
         }
       );
+      console.log(response.data.content)
       setEquipment(response.data.content);
       setTotalPages(response.data.totalPages);
     } catch (error) {

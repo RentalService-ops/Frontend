@@ -19,7 +19,7 @@ const AdminBookings = () => {
   const [error, setError] = useState(null);
   const [cookie] = useCookies();
 
-  const productsPerPage = 2;
+  const productsPerPage = 5;
   const config=[
     {
       label: "Sr No.",

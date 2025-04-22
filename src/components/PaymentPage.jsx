@@ -4,7 +4,7 @@ import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 import { FaMoneyCheckAlt } from "react-icons/fa";
 import Pagination from "../layout/Pagination";
-
+import _ from 'lodash';
 const PaymentPage = () => {
   const [payments, setPayments] = useState([]);
   const [filteredPayments, setFilteredPayments] = useState([]);
@@ -25,8 +25,9 @@ const PaymentPage = () => {
             },
           }
         );
-        
-        setPayments(response.data);
+        if(!_.isEqual(response.data)){
+          setPayments(response.data);
+        }
       } catch (error) {
         console.error("Failed to fetch payments:", error);
       }
@@ -35,7 +36,7 @@ const PaymentPage = () => {
     if (cookies.jwtToken) {
       fetchPayments();
     }
-  }, [cookies.jwtToken]);
+  }, [cookies.jwtToken,payments]);
 
   useEffect(() => {
     let sorted = [...payments];

@@ -7,6 +7,7 @@ import axios from "axios";
 import Pagination from "../layout/Pagination";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Table from "./Table";
+import _ from 'lodash';
 
 export default function Categories({ isSidebarOpen }) {
   const [showAddCategory, setShowAddCategory] = useState(false);
@@ -79,7 +80,7 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
       }
       setError("");
     } catch (err) {
-      setError("Failed to fetch categories. Please try again.");
+      setError("Failed to fetch categories. Please try again."+err.message);
     } finally {
       setLoading(false);
     }

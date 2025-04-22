@@ -4,6 +4,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import Pagination from "../layout/Pagination";
 import Table from "../components/Table";
+import _ from 'lodash';
 
 const OrderPage = ({ isSidebarOpen }) => {
   const [cookies] = useCookies(["jwtToken"]);
@@ -195,12 +196,19 @@ const OrderPage = ({ isSidebarOpen }) => {
             </button>
           )}
           {
-            order.status !=="APPROVED" && order.status !== "PENDING" && (
+            order.status !=="APPROVED" && order.status !== "PENDING" && order.status!=="COMPLETED" && (
               <button
                 className="btn btn-secondary btn-sm rounded-pill"
                 disabled
               >
                 N/A
+              </button>
+            )
+          }
+          {
+            order.status === "COMPLETED" && order.endDate < new Date().toISOString().split("T")[0] && (
+              <button className="btn btn-warning btn-sm rounded-pill" onClick={()=>handleReturnEquipment(order.bookingId)}>
+                Return Equipment
               </button>
             )
           }
@@ -211,8 +219,22 @@ const OrderPage = ({ isSidebarOpen }) => {
 
   useEffect(() => {
     fetchOrders();
-  }, [cookies]);
+  }, [cookies,orders]);
 
+  async function handleReturnEquipment(orderId){
+    try{
+      await axios.put(`http://localhost:8080/api/bookings/${orderId}/return`,{},{
+        headers:{
+          Authorization:`Bearer ${cookies.jwtToken}`
+        }
+      })
+      alert(response.data);
+    }
+    catch(err){
+      console.log(err.response)
+      alert(err.response);
+    }
+  }
   const fetchOrders = async () => {
     try {
       if (!token) {
@@ -228,8 +250,10 @@ const OrderPage = ({ isSidebarOpen }) => {
           withCredentials: true,
         }
       );
+      if(!_.isEqual(response.data,orders)){
       setOrders(response.data);
       setError(null);
+      }
     } catch (error) {
       console.error("Error fetching orders:", error);
       if (error.response && error.response.status === 404) {

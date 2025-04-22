@@ -12,7 +12,6 @@ import {
   InputGroup 
 } from "react-bootstrap";
 import { List } from "lucide-react";
-import { Trash } from "lucide-react";
 import Pagination from "../../layout/Pagination";
 
 const AdminCategory = () => {

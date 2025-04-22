@@ -4,6 +4,7 @@ import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 import { FaBell } from "react-icons/fa";
 import Pagination from "../layout/Pagination";
+import _ from 'lodash';
 
 const NotificationPage = () => {
   const [notifications, setNotifications] = useState([]);
@@ -34,7 +35,7 @@ const NotificationPage = () => {
     if (cookies.jwtToken) {
       fetchNotifications();
     }
-  }, [cookies.jwtToken]);
+  }, [cookies.jwtToken,notifications]);
 
   useEffect(() => {
     let sorted = [...notifications];
