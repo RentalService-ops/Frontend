@@ -2,12 +2,10 @@ import { Outlet } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import AdminSidebar from "./AdminSidebar";
 import { useState, useEffect } from "react";
-import { Bell, Mail } from "lucide-react";
 
 export default function AdminLayout() {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
-  const [showMobileNav, setShowMobileNav] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -17,59 +15,24 @@ export default function AdminLayout() {
     };
 
     window.addEventListener("resize", handleResize);
-    handleResize(); // Initial check
+    handleResize(); 
     
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
     <div className="admin-layout bg-light">
-      {/* Top Navigation Bar */}
-      {/* <header className="admin-header bg-white shadow-sm py-2 px-3 d-flex justify-content-between align-items-center">
-        <div className="d-flex align-items-center">
-          {isMobile && (
-            <button 
-              className="btn btn-sm btn-outline-secondary me-2"
-              onClick={() => setShowMobileNav(!showMobileNav)}
-            >
-              <span className="navbar-toggler-icon"></span>
-            </button>
-          )}
-          <h4 className="mb-0">RentEase Admin</h4>
-        </div>
-        <div className="d-flex align-items-center">
-          <button className="btn btn-link text-secondary position-relative me-3">
-            <Bell size={20} />
-            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-              3
-            </span>
-          </button>
-          <button className="btn btn-link text-secondary position-relative me-3">
-            <Mail size={20} />
-            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-              5
-            </span>
-          </button>
-          <div className="admin-avatar rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style={{ width: '34px', height: '34px' }}>
-            A
-          </div>
-        </div>
-      </header> */}
       
       <Container fluid className="p-0">
         <Row className="g-0" style={{ minHeight: "calc(100vh - 56px)" }}>
-          {/* Sidebar */}
+
           <Col lg={sidebarExpanded ? 2 : 1} className="p-0 position-relative">
             <AdminSidebar 
               isExpanded={sidebarExpanded} 
               setIsExpanded={setSidebarExpanded}
-              isMobile={isMobile}
-              showMobile={showMobileNav}
-              setShowMobile={setShowMobileNav}
             />
           </Col>
-          
-          {/* Main Content */}
+
           <Col 
             lg={sidebarExpanded ? 10 : 11} 
             xs={12} 

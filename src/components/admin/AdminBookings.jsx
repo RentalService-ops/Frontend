@@ -4,7 +4,6 @@ import { useCookies } from "react-cookie";
 import { 
   Container, 
   Card, 
-  Badge, 
   Spinner,
   Alert 
 } from "react-bootstrap";
@@ -20,7 +19,7 @@ const AdminBookings = () => {
   const [error, setError] = useState(null);
   const [cookie] = useCookies();
 
-  const productsPerPage = 5;
+  const productsPerPage = 2;
   const config=[
     {
       label: "Sr No.",
@@ -48,7 +47,7 @@ const AdminBookings = () => {
     setError(null);
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/admin/bookings?page=${page - 1}&size=${productsPerPage}&search=${search}`, // Adjusted for 1-based indexing
+        `http://localhost:8080/api/admin/bookings?page=${page - 1}&size=${productsPerPage}&search=${search}`, 
         {
           headers: { Authorization: `Bearer ${cookie.jwtToken}` },
         }
@@ -61,22 +60,6 @@ const AdminBookings = () => {
       setError("Failed to load bookings. Please try again.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Get status badge styling
-  const getStatusBadge = (status) => {
-    switch(status) {
-      case "APPROVED":
-        return <Badge bg="success">APPROVED</Badge>;
-      case "PENDING":
-        return <Badge bg="warning" text="dark">PENDING</Badge>;
-      case "REJECTED":
-        return <Badge bg="danger">REJECTED</Badge>;
-      case "CANCELLED":
-        return <Badge bg="secondary">CANCELLED</Badge>;
-      default:
-        return <Badge bg="info">{status}</Badge>;
     }
   };
 

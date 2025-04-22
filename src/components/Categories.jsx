@@ -74,8 +74,9 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
           withCredentials: true,
         }
       );
-
-      setCategoryData(response.data.body);
+      if(!_.isEqual(response.data.body,categoryData)){
+        setCategoryData(response.data.body);
+      }
       setError("");
     } catch (err) {
       setError("Failed to fetch categories. Please try again.");

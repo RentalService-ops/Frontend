@@ -3,8 +3,6 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import {
   Container,
-  Row,
-  Col,
   Card,
   Table,
   Button,
@@ -58,7 +56,7 @@ const AdminEquipment = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this equipment?")) {
       try {
-        await axios.delete(`http://localhost:8080/api/admin/equipment/${id}`, {
+        await axios.delete(`http://localhost:8080/api/equipment/deleteEquipment/${id}`, {
           headers: {
             Authorization: `Bearer ${cookie.jwtToken}`,
           },
