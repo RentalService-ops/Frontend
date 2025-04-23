@@ -5,10 +5,9 @@ import { useCookies } from "react-cookie";
 import axios from "axios";
 
 const LoginPage = ({ setIsAuthenticated, isAuthenticated }) => {
-  const [cookies, setCookie] = useCookies(["jwtToken", "role"]);
+  const [cookies] = useCookies(["jwtToken", "role"]);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
-  const [loginError, setLoginError] = useState(""); // Store login error message
   const navigate = useNavigate();
 
   const getHomeRoute = useCallback((role) => {
@@ -57,8 +56,8 @@ const LoginPage = ({ setIsAuthenticated, isAuthenticated }) => {
       setIsAuthenticated(true);
   
       setTimeout(() => {
-        navigate("/"); // Navigate first
-        window.location.reload(); // Reload after navigation
+        navigate("/");
+        window.location.reload(); 
       }, 1);
       
     } catch (err) {
@@ -69,9 +68,9 @@ const LoginPage = ({ setIsAuthenticated, isAuthenticated }) => {
   
   useEffect(() => {
     if (isAuthenticated && cookies.role) {
-      navigate(getHomeRoute(userRole)); // Navigate first
+      navigate(getHomeRoute(userRole));
       setTimeout(() => {
-        window.location.reload(); // Then reload after a short delay
+        window.location.reload(); 
       }, 300);
     }
   }, [isAuthenticated, cookies.role, navigate, getHomeRoute]);
@@ -81,8 +80,6 @@ const LoginPage = ({ setIsAuthenticated, isAuthenticated }) => {
     <div className="login-container">
       <form className="login-form" onSubmit={handleSubmit} noValidate>
         <h2 className="form-title">Login</h2>
-
-        {loginError && <p className="error-message">{loginError}</p>}
 
         <div className="form-group">
           <div className="input-wrapper">

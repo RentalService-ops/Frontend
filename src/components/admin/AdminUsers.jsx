@@ -43,7 +43,6 @@ const AdminUsers = () => {
       setUsers(response.data.content);
       setTotalPages(response.data.totalPages);
 
-      // Update statistics
       setStats({
         allUsers: response.data.totalItems,
         totalUsers: response.data.content.filter(u => u.role === "user").length,
@@ -72,7 +71,6 @@ const AdminUsers = () => {
     }
   };
 
-  // Table column definitions
   const columns = [
     { header: "ID", accessor: "id" },
     { header: "Name", accessor: "username" },
@@ -92,7 +90,6 @@ const AdminUsers = () => {
     },
   ];
 
-  // Actions renderer
   const renderActions = (user) => (
     <Button
       variant="outline-danger"
@@ -110,7 +107,6 @@ const AdminUsers = () => {
         <h2 className="mb-0">User Management</h2>
       </div>
 
-      {/* Statistics Cards */}
       <Row className="g-3 mb-4">
         {[
           { title: "All Users", value: stats.allUsers, icon: <UsersIcon size={24} />, color: "primary" },
@@ -134,7 +130,6 @@ const AdminUsers = () => {
         ))}
       </Row>
 
-      {/* User Table */}
       <AdminDataTable
         columns={columns}
         data={users}
@@ -142,14 +137,12 @@ const AdminUsers = () => {
         error={error}
         emptyMessage="No users found."
         loadingMessage="Loading users..."
-        // searchPlaceholder="Search users by name, email or role..."
         searchPlaceholder="Search users by name..."
         search={search}
         setSearch={setSearch}
         renderActions={renderActions}
       />
 
-      {/* Custom Pagination Component */}
       <Pagination 
         data={users}
         currentPage={page}

@@ -107,7 +107,6 @@ export default function ForgotPassword() {
                     <>
                         <h4 className="text-center mb-4">OTP Verification</h4>
                         <div className="form-group mb-3">
-                            {/* <label htmlFor="otpInput">Enter OTP</label> */}
                             <input
                                 id="otpInput"
                                 type="number"

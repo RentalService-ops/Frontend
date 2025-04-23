@@ -101,7 +101,7 @@ const PaymentPage = () => {
                 }}
               >
                 <div>
-                  <strong>Equipment:</strong> {payment.equpmentName} <br />
+                  <strong>Equipment:</strong> {payment.equipmentName} <br />
                   <strong>Payment ID:</strong> {payment.razorpayPaymentId}
                 </div>
                 <div>

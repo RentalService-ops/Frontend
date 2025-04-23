@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { Table, Spinner, Form, InputGroup, Button, Card } from "react-bootstrap";
 import { Search, RefreshCw, Download } from "lucide-react";
 
@@ -39,7 +38,6 @@ export default function AdminDataTable({
         </Card.Header>
       )}
       <Card.Body className="p-3">
-        {/* Search Box */}
         <div className="mb-4 ">
           <InputGroup className="border border-primary border-1">
             <InputGroup.Text className="bg-light border-end-0">
@@ -55,7 +53,6 @@ export default function AdminDataTable({
           </InputGroup>
         </div>
 
-        {/* Data Table */}
         <div className="table-responsive">
           <Table hover bordered className="align-middle mb-0 table-striped">
             <thead className="table-dark">

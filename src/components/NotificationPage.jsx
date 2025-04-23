@@ -61,7 +61,7 @@ const NotificationPage = () => {
     setCurrentPage(1); // Reset on sort change
   }, [notifications, sortOption]);
 
-  // Pagination logic using slice
+  // Pagination logic
   const indexOfLast = currentPage * productsPerPage;
   const indexOfFirst = indexOfLast - productsPerPage;
   const currentItems = filteredNotifications.slice(indexOfFirst, indexOfLast);
@@ -114,7 +114,6 @@ const NotificationPage = () => {
     )}
   </div>
 
-  {/* Always visible at the bottom */}
   <div className="d-flex justify-content-center mt-4">
     <Pagination
       data={filteredNotifications}

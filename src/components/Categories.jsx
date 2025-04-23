@@ -156,7 +156,6 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
                   <Table config={config} keyFn={(category)=>category.categoryId} bookings={currentCategories}/>
                   } 
 
-                  {/* Fixed Pagination at Bottom */}
                   <Pagination data={categoryData} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={categoriesPerPage} />
               </div>
               </>
@@ -166,7 +165,6 @@ const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
         <AddCategory setShowAddCategory={setShowAddCategory} />
       )}
 
-      {/* Edit Modal */}
       {showEditModal && (
         <EditCategory
           category={selectedCategory}

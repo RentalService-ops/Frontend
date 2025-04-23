@@ -195,7 +195,6 @@ export default function ProfilePage() {
           </Row>
         )}
 
-        {/* Add/Edit Address Modal */}
         <Modal show={showAddressModal} onHide={() => {
           setShowAddressModal(false);
           setEditingAddressId(null);
@@ -232,7 +231,6 @@ export default function ProfilePage() {
           </Modal.Footer>
         </Modal>
 
-        {/* Edit Profile Modal */}
 <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)} centered>
   <Modal.Header closeButton>
     <Modal.Title>Edit Profile</Modal.Title>
@@ -277,8 +275,6 @@ export default function ProfilePage() {
   </Modal.Footer>
 </Modal>
 
-
-        {/* Delete Confirmation Modal */}
         <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
           <Modal.Header closeButton>
             <Modal.Title>Confirm Delete</Modal.Title>

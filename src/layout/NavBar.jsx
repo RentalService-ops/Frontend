@@ -20,7 +20,7 @@ const Navbar = ({ toggleSidebar }) => {
     try {
       const decoded = jwtDecode(cookies.jwtToken);
       userId = decoded.user_id;
-      userRole = decoded.role; // ✅ Extract role
+      userRole = decoded.role; 
     } catch (error) {
       console.error("Failed to decode token:", error);
     }
@@ -36,8 +36,8 @@ const Navbar = ({ toggleSidebar }) => {
 
   useEffect(() => {
     if (cookies.jwtToken && userId && userRole === "user") {
-      const socket = new SockJS("http://localhost:8080/ws");
-      const client = over(socket);
+      const socket = new SockJS("http://localhost:8080/ws");//Initializing a web socket connection.
+      const client = over(socket);//Adding STOMP protocol to web socket.
 
       client.connect({}, () => {
         console.log("Connected to WebSocket");
@@ -95,7 +95,6 @@ const Navbar = ({ toggleSidebar }) => {
           </ul>
 
           <div className="d-flex gap-2 align-items-center">
-            {/* ✅ Show bell only for role=user */}
             {cookies.jwtToken && userRole === "user" && (
               <div className="dropdown me-3 position-relative">
                 <button

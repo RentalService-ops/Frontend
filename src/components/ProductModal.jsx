@@ -15,7 +15,7 @@ const ProductModal = ({ product, show, onClose }) => {
 
   const [addresses, setAddresses] = useState([]);
   const [cookie] = useCookies(["jwtToken"]);
-  const [error, setError] = useState("");  // State to manage error messages
+  const [error, setError] = useState("");  
 
   useEffect(() => {
     if (show) {
@@ -89,7 +89,7 @@ const ProductModal = ({ product, show, onClose }) => {
       return;
     }
 
-    // Check if the quantity exceeds available stock
+
     if (quantity > product.quantity) {
       setError(`Sorry, only ${product.quantity} units are available.`);
       return;
@@ -118,7 +118,7 @@ const ProductModal = ({ product, show, onClose }) => {
         withCredentials: true,
       });
 
-      setError(""); // Clear error on successful booking
+      setError("");
       alert("Booking successful!");
       onClose();
     } catch (error) {
@@ -136,7 +136,7 @@ const ProductModal = ({ product, show, onClose }) => {
       quantity: 1,
       selectedAddress: "",
     });
-    setError(""); // Reset error when modal is closed
+    setError(""); 
     onClose();
   }
 
@@ -203,7 +203,7 @@ const ProductModal = ({ product, show, onClose }) => {
                       required
                     />
                     {error && error.includes("units") && (
-                      <div className="text-danger mt-2">{error}</div>  // Display error message
+                      <div className="text-danger mt-2">{error}</div>  
                     )}
                   </div>
                   <div className="mb-2">

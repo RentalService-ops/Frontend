@@ -10,7 +10,7 @@ export default function RentalBookingHistory() {
   const [bookings, setBookings] = useState([]);
   const [cookies] = useCookies();
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState("APPROVED"); // default tab
+  const [activeTab, setActiveTab] = useState("APPROVED");
   const productsPerPage = 7;
 
   useEffect(() => {
@@ -82,7 +82,6 @@ export default function RentalBookingHistory() {
     <div className="container d-flex flex-column" style={{ height: "100vh" }}>
   <h3 className="mb-3">Booking History</h3>
 
-  {/* Tabs */}
   <div className="mb-3">
     {statusOptions.map((status) => (
       <button
@@ -100,7 +99,6 @@ export default function RentalBookingHistory() {
     ))}
   </div>
 
-  {/* Table and Pagination Area */}
   <div className="d-flex flex-column flex-grow-1">
     <Table
       bookings={currentBookings}

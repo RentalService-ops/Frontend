@@ -187,7 +187,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: white; /* Optional: Adjust if necessary */
+  background-color: white;
    z-index: 999;
 } 
 
@@ -236,4 +236,8 @@
   font-size: 12px;
 }
  
+.sidebar-link:not(.bg-primary):hover {
+  background-color: rgba(204, 197, 197, 0.78);
+  transform: translateX(3px);
+}
 

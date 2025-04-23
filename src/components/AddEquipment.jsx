@@ -18,7 +18,6 @@ export default function AddEquipment({setShowAddEquipment}) {
     });
     const [cookie] = useCookies(["jwtToken"]);
 
-    // Decode JWT Token
     let userId = null;
     let userRole = null;
 
@@ -60,7 +59,7 @@ export default function AddEquipment({setShowAddEquipment}) {
             setImageSrc(objectUrl);
             setFormData({ ...formData, image: file });
 
-            return () => URL.revokeObjectURL(objectUrl); // ✅ Cleanup memory
+            return () => URL.revokeObjectURL(objectUrl); 
         }
     }
 
@@ -71,7 +70,7 @@ export default function AddEquipment({setShowAddEquipment}) {
             return;
         }
 
-        setLoading(true); // Disable button during submission
+        setLoading(true); 
 
         const equipmentJson = JSON.stringify({
             name: formData.name,
@@ -83,8 +82,8 @@ export default function AddEquipment({setShowAddEquipment}) {
         });
 
         const formDataToSend = new FormData();
-        formDataToSend.append("equipment", new Blob([equipmentJson], { type: "application/json" })); // JSON as Blob
-        formDataToSend.append("imageFile", formData.image || new Blob()); // Send actual image file
+        formDataToSend.append("equipment", new Blob([equipmentJson], { type: "application/json" })); 
+        formDataToSend.append("imageFile", formData.image || new Blob()); 
 
         try {
             const response = await axios.post("http://localhost:8080/api/equipment/addEquipment", formDataToSend, {
@@ -102,7 +101,7 @@ export default function AddEquipment({setShowAddEquipment}) {
             console.error("❌ Error adding equipment:", err);
             alert(err.message || "Failed to add equipment. Please try again.");
         } finally {
-            setLoading(false); // Enable button after request
+            setLoading(false); 
         }
     }
 

@@ -23,7 +23,6 @@ export default function EditEquipmentForm({showEditModal,handleSaveEdit,setEdite
         {editedEquipment && (
           <div className="row">
             <div className="col-md-7">
-              {/* Hidden Input for Equipment ID */}
               <input type="hidden" value={editedEquipment.equipmentId} />
 
               <label>Name</label>

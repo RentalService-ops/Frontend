@@ -91,15 +91,13 @@ const UserDashboard = ({ isSidebarOpen }) => {
   };
 
   function handleFilter(category) {
-    console.log("Selected Category:", category); // Log the selected category
     setSelectedCategory(category);
     const newFilteredProducts =
       category === "All Categories"
         ? products
-        : products.filter((product) => product.categoryName.toLowerCase() === category.toLowerCase()); // Case-insensitive matching
-    console.log("Filtered Products:", newFilteredProducts); // Log filtered products
+        : products.filter((product) => product.categoryName.toLowerCase() === category.toLowerCase()); // 
     setFilteredProducts(newFilteredProducts);
-    setCurrentPage(1); // Reset to first page after applying filter
+    setCurrentPage(1); 
   }
 
   const handleSearch = (e) => {
@@ -126,7 +124,7 @@ const UserDashboard = ({ isSidebarOpen }) => {
       }}
     >
       <div className="container-fluid p-4">
-        {/* Filters */}
+
         <div className="d-flex justify-content-between mb-4">
           <div className="w-50 pe-3">
             <h5 className="text-info">Search Products</h5>
@@ -155,7 +153,7 @@ const UserDashboard = ({ isSidebarOpen }) => {
           </div>
         </div>
 
-        {/* Product Grid */}
+
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
           {currentProducts.map((product) => (
             <div className="col" key={product.equipmentId}>
@@ -170,7 +168,6 @@ const UserDashboard = ({ isSidebarOpen }) => {
                   <Card.Title>{product.name}</Card.Title>
                   <Card.Text>{product.description}</Card.Text>
 
-                  {/* Quantity Display */}
                   {product.quantity > 0 ? (
                     <span className="badge bg-success mb-2">In stock: {product.quantity}</span>
                   ) : (
@@ -198,7 +195,6 @@ const UserDashboard = ({ isSidebarOpen }) => {
           ))}
         </div>
 
-        {/* Pagination */}
         <Pagination
           data={filteredProducts}
           currentPage={currentPage}

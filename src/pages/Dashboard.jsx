@@ -6,9 +6,7 @@ export default function Dashboard() {
   return (
     <div className="d-flex flex-column min-vh-100 bg-dark text-white">
 
-      {/* Main Content */}
       <div className="flex-grow-1 d-flex flex-column justify-content-center text-center">
-        {/* Hero Section */}
         <Container className="py-5">
           <h1 className="display-4 fw-bold">Welcome to Equipment Rental</h1>
           <p className="lead">
@@ -17,7 +15,6 @@ export default function Dashboard() {
           <Button variant="primary" className="mt-3" onClick={()=>navigate("/login")}>Explore Now</Button>
         </Container>
 
-        {/* About Section */}
         <Container className="py-5">
           <Row className="justify-content-center">
             <Col md={8} className="text-center">

@@ -71,15 +71,12 @@ const AdminEquipment = () => {
 
   return (
     <Container fluid>
-      {/* Heading similar to AdminUsers */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">Equipment Management</h2>
       </div>
 
-      {/* Search Bar and Table Container */}
       <Card className="shadow-sm">
         <Card.Body>
-          {/* Search Bar similar to AdminDataTable */}
           <div className="mb-4 border border-primary border-1">
             <InputGroup>
               <Form.Control
@@ -91,14 +88,14 @@ const AdminEquipment = () => {
             </InputGroup>
           </div>
 
-          {/* Error Alert */}
+
           {error && (
             <Alert variant="danger" onClose={() => setError(null)} dismissible>
               {error}
             </Alert>
           )}
 
-          {/* Equipment Table */}
+
           <div className="table-responsive">
             <Table hover striped bordered>
               <thead className="table-dark">
@@ -159,7 +156,6 @@ const AdminEquipment = () => {
             </Table>
           </div>
 
-          {/* Custom Pagination Component */}
           <Pagination
             data={equipment}
             currentPage={page}

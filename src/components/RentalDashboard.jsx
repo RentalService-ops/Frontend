@@ -79,7 +79,6 @@ const RentalDashboard = (props) => {
     color: "white",
   };
 
-  // 👉 Conditional rendering for detailed Equipment view
   if (showAllEquipments) {
     return <Equipments onBack={() => setShowAllEquipments(false)} />;
   }
@@ -113,7 +112,6 @@ const RentalDashboard = (props) => {
         </div>
       </div>
 
-      {/* Equipment Table Preview */}
       <div className="card" style={darkMode ? darkCard : {}}>
         <div className="card-header d-flex justify-content-between align-items-center">
           <h5 className="mb-0">Your Equipments</h5>

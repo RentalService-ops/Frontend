@@ -350,8 +350,6 @@ const OrderPage = ({ isSidebarOpen }) => {
         }}
       >
         <h2 className="mb-4 fw-bold text-primary">My Orders</h2>
-
-        {/* Filter */}
         <div className="card shadow-sm mb-4 border-0">
           <div className="card-body">
             <h5 className="card-title text-secondary">Filter Orders</h5>
@@ -371,7 +369,6 @@ const OrderPage = ({ isSidebarOpen }) => {
           </div>
         </div>
 
-        {/* Table or Loading/Error */}
         {loading ? (
           <p className="text-muted">⏳ Loading orders...</p>
         ) : error === "NO_ORDERS" ? (
@@ -397,7 +394,6 @@ const OrderPage = ({ isSidebarOpen }) => {
         )}
       </div>
 
-      {/* Modal */}
       {showModal && (
         <>
           <div

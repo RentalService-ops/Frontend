@@ -17,16 +17,13 @@ function SignupPage() {
   const [errors, setErrors] = useState({});
   const [isPasswordShown, setIsPasswordShown] = useState(false);
 
-  // Validate form fields
   const validateForm = async () => {
     const errors = {};
 
-    // Name Validation
     if (!formData.username.trim()) {
       errors.name = 'Name is required.';
     }
 
-    // Email Validation
     if (!formData.email) {
       errors.email = 'Email is required.';
     } else {
@@ -36,7 +33,6 @@ function SignupPage() {
       }
     }
 
-    // Password Validation
     if (!formData.password) {
       errors.password = 'Password is required.';
     } else if (formData.password.length < 8) {
@@ -49,7 +45,6 @@ function SignupPage() {
       }
     }
 
-    // Phone Number Validation
     if (!formData.phoneNumber) {
       errors.phoneNumber = 'Phone number is required.';
     } else {
@@ -68,12 +63,10 @@ function SignupPage() {
   };
 
 
-  // Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (await validateForm()) {
@@ -85,7 +78,6 @@ function SignupPage() {
         console.log(err.message)
       }
 
-      // Reset form after successful submission
       setFormData({ username: '', email: '', password: '', phoneNumber: '',role:'' });
     }
 

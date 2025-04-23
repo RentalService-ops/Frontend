@@ -15,11 +15,8 @@ export default function Equipments() {
     const [showAddEquipment, setShowAddEquipment] = useState(false);
     const [editedEquipment,setEditedEquipment] = useState({});
 
-    // Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 5;
-
-    // Modal States
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedEquipment, setSelectedEquipment] = useState(null);
@@ -129,8 +126,6 @@ export default function Equipments() {
 
         const formDataToSend = new FormData();
         formDataToSend.append("equipmentDTO", new Blob([equipmentJson], { type: "application/json" }));
-
-        // Ensure imageFile is sent correctly
         if (editedEquipment.imageFile) {
             formDataToSend.append("imageFile", editedEquipment.imageFile);
         }
@@ -170,14 +165,12 @@ export default function Equipments() {
 
                     <div className="d-flex flex-column flex-grow-1">
                         <Table config={tableData} bookings={equipmentData.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)} keyFn={(equipment) => equipment.equipmentId} />
-                        {/* Fixed Pagination at Bottom */}
                         <div className="d-flex justify-content-center mt-auto">
                             <Pagination data={equipmentData} currentPage={currentPage} setCurrentPage={setCurrentPage} productsPerPage={productsPerPage} />
                         </div>
                     </div>
 
-                    {/* Modals */}
-                    {/* View Details Modal */}
+
                     <Modal show={showDetailModal} onHide={() => setShowDetailModal(false)}>
                         <Modal.Header closeButton>
                             <Modal.Title>Equipment Details</Modal.Title>

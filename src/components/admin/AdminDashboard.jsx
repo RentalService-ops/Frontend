@@ -29,7 +29,6 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
       
-      // Fetch summary stats
       const userResponse = await axios.get(
         "http://localhost:8080/api/admin/users?page=0&size=1",
         { headers: { Authorization: `Bearer ${cookie.jwtToken}` } }
@@ -39,16 +38,13 @@ const AdminDashboard = () => {
         "http://localhost:8080/api/admin/getAllBookings",
         { headers: { Authorization: `Bearer ${cookie.jwtToken}` } }
       );
-      
-      
-      // Update stats with real data
+
       setStats(prev => ({
         ...prev,
         users: { ...prev.users, total: userResponse.data.totalItems || 0 },
         bookings: { ...prev.bookings, total: bookingsResponse.data.totalBookings || 0 }
       }));
-      
-      // Set recent bookings
+
       setRecentBookings(bookingsResponse.data.recentbookings || []);
       
     } catch (error) {
@@ -58,7 +54,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // Dashboard summary cards
+
   const summaryCards = [
     { 
       title: "Total Users", 
@@ -94,7 +90,6 @@ const AdminDashboard = () => {
     }
   ];
 
-  // Popular categories for chart
   const popularCategories = [
     { name: "Camera Equipment", percentage: 35 },
     { name: "Audio Systems", percentage: 25 },
@@ -103,7 +98,6 @@ const AdminDashboard = () => {
     { name: "Others", percentage: 5 }
   ];
 
-  // Recent activities
   const recentActivities = [
     { id: 1, action: "New user registered", time: "10 minutes ago", user: "Bhavik Kumar" },
     { id: 2, action: "Equipment added", time: "1 hour ago", user: "Vipul Sahani" },
@@ -125,7 +119,6 @@ const AdminDashboard = () => {
         </div>
       </div>
       
-      {/* Summary Stats */}
       <Row className="g-3 mb-4">
         {summaryCards.map((card, index) => (
           <Col key={index} xl={3} md={6}>
@@ -160,15 +153,11 @@ const AdminDashboard = () => {
       </Row>
       
       <Row className="g-3">
-        {/* Recent Bookings */}
         <Col lg={8}>
           <Card className="shadow-sm border-0 h-100">
             <Card.Header className="bg-white d-flex justify-content-between align-items-center py-3">
               <h5 className="mb-0">Recent Bookings</h5>
               <div className="d-flex align-items-center">
-                <Button variant="outline-secondary" size="sm" className="me-2">
-                  <MoreHorizontal size={16} />
-                </Button>
                 <Link to="/admin/bookings" className="btn btn-link p-0 text-decoration-none">View All</Link>
               </div>
             </Card.Header>
@@ -221,9 +210,7 @@ const AdminDashboard = () => {
           </Card>
         </Col>
         
-        {/* Right Column - Stats */}
         <Col lg={4}>
-          {/* Popular Categories */}
           <Card className="shadow-sm border-0 mb-3">
             <Card.Header className="bg-white py-3">
               <h5 className="mb-0">Popular Categories</h5>
@@ -251,7 +238,6 @@ const AdminDashboard = () => {
             </Card.Body>
           </Card>
           
-          {/* Recent Activities */}
           <Card className="shadow-sm border-0">
             <Card.Header className="bg-white py-3">
               <h5 className="mb-0">Recent Activities</h5>

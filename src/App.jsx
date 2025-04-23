@@ -37,7 +37,7 @@ function App() {
   }, []);
 
   const toggleSidebar = () => {
-    setIsSidebarOpen((prev) => !prev); // Ensure proper state update
+    setIsSidebarOpen((prev) => !prev); 
   };
 
   const getHomeRoute = () => {

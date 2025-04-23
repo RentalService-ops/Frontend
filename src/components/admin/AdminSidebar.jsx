@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unknown-property */
 import { NavLink } from "react-router-dom";
 import { Nav, Button } from "react-bootstrap";
 import { 
@@ -13,7 +12,6 @@ import {
 } from "lucide-react";
 
 const AdminSidebar = ({ isExpanded, setIsExpanded }) => {
-  // Menu items configuration
   const menuItems = [
     { to: "/admin/dashboard", label: "Dashboard", icon: <Home size={20} /> },
     { to: "/admin/users", label: "Users", icon: <Users size={20} /> },
@@ -24,7 +22,6 @@ const AdminSidebar = ({ isExpanded, setIsExpanded }) => {
   ];
 
 
-  //Sidebar
   const DesktopSidebar = () => (
     <div 
       className="bg-dark text-light h-100 d-flex flex-column transition-all shadow"
@@ -34,7 +31,7 @@ const AdminSidebar = ({ isExpanded, setIsExpanded }) => {
         overflowX: "hidden" 
       }}
     >
-      {/* Header/Logo Area */}
+
       <div className="p-3 d-flex justify-content-between align-items-center border-bottom border-secondary">
         {isExpanded && <h5 className="m-0 text-light">Admin Panel</h5>}
         <Button 
@@ -47,7 +44,7 @@ const AdminSidebar = ({ isExpanded, setIsExpanded }) => {
         </Button>
       </div>
 
-      {/* Nav Items */}
+
       <Nav className="flex-column mt-3 w-100 sidebar-nav">
         {menuItems.map((item, index) => (
           <NavLink
@@ -64,15 +61,8 @@ const AdminSidebar = ({ isExpanded, setIsExpanded }) => {
           </NavLink>
         ))}
       </Nav>
-
-      {/* CSS for hover effect */}
-      <style jsx>{`
-        .sidebar-link:not(.bg-primary):hover {
-          background-color: rgba(204, 197, 197, 0.78);
-          transform: translateX(3px);
-        }
-      `}</style>
     </div>
+    
   );
   return <DesktopSidebar />;
 };

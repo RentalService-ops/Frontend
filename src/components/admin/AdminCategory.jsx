@@ -19,7 +19,6 @@ const AdminCategory = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
 
   const productsPerPage = 5;
@@ -33,14 +32,12 @@ const AdminCategory = () => {
 
   const fetchCategories = async () => {
     setLoading(true);
-    setError(null);
     try {
       const token = getToken();
       if (!token) {
         throw new Error("JWT Token not found");
       }
 
-      // Added search parameter to URL
       const response = await axios.get(
         `http://localhost:8080/api/admin/categories?page=${currentPage - 1}&size=${productsPerPage}&search=${search}`,
         { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
@@ -49,7 +46,6 @@ const AdminCategory = () => {
       setCategories(response.data.content);
       setTotalPages(response.data.totalPages);
     } catch (error) {
-      setError(error.message || "Error fetching categories");
       console.error("Error fetching categories:", error);
     } finally {
       setLoading(false);
@@ -66,12 +62,10 @@ const AdminCategory = () => {
 
   return (
     <Container fluid>
-      {/* Heading similar to AdminUsers */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">Category Management</h2>
       </div>
 
-      {/* Stats Card */}
       <Row className="mb-4">
         <Col md={4}>
           <Card className="border-primary h-100 shadow-sm">
@@ -88,10 +82,8 @@ const AdminCategory = () => {
         </Col>
       </Row>
 
-      {/* Category Table Container */}
       <Card className="shadow-sm">
         <Card.Body>
-          {/* Search Bar similar to AdminDataTable */}
           <div className="mb-4 border border-primary border-1">
             <InputGroup>
               <Form.Control
@@ -102,13 +94,6 @@ const AdminCategory = () => {
               />
             </InputGroup>
           </div>
-
-          {/* Error Alert */}
-          {error && (
-            <Alert variant="danger" onClose={() => setError(null)} dismissible>
-              {error}
-            </Alert>
-          )}
 
           {loading ? (
             <div className="text-center py-4">
@@ -133,16 +118,13 @@ const AdminCategory = () => {
                       <td>{category.categoryId}</td>
                       <td>{category.name}</td>
                       <td>
-                        {category.description?.length > 100 
-                          ? `${category.description.substring(0, 100)}...` 
-                          : category.description || "No description available"}
+                        {category.description? category.description : "No description available"}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </Table>
-              
-              {/* Custom Pagination Component */}
+
               <Pagination 
                 data={categories}
                 currentPage={currentPage}
