@@ -138,7 +138,39 @@ const OrderPage = ({ isSidebarOpen }) => {
       alert("Something went wrong with payment.");
     }
   };
-
+  function returnActionButton(order){
+    let returnButton;
+    if(order.status === "PENDING"){
+      returnButton=<button
+      className="btn btn-danger btn-sm rounded-pill me-2"
+      onClick={() => handleCancelClick(order.bookingId)}
+    >
+      Cancel
+    </button>
+    }
+    else if(order.status==="APPROVED"){
+      returnButton=<button
+      className="btn btn-success btn-sm rounded-pill"
+      onClick={() => handlePayNow(order)}
+    >
+      Pay Now
+    </button>
+    }
+    else if(order.status === "COMPLETED" && !order.returned && order.endDate < new Date().toISOString().split("T")[0]){
+      returnButton=<button className="btn btn-warning btn-sm rounded-pill" onClick={()=>handleReturnEquipment(order.bookingId)}>
+      Return Equipment
+    </button>
+    }
+    else{
+      returnButton=<button
+      className="btn btn-secondary btn-sm rounded-pill"
+      disabled
+    >
+      N/A
+    </button>
+    }
+    return returnButton;
+  }
   const config = [
     {
       label: "Sr No.",
@@ -179,39 +211,7 @@ const OrderPage = ({ isSidebarOpen }) => {
       label: "Action",
       render: (order) => (
         <>
-          {order.status === "PENDING" && (
-            <button
-              className="btn btn-danger btn-sm rounded-pill me-2"
-              onClick={() => handleCancelClick(order.bookingId)}
-            >
-              Cancel
-            </button>
-          )}
-          {order.status === "APPROVED" && (
-            <button
-              className="btn btn-success btn-sm rounded-pill"
-              onClick={() => handlePayNow(order)}
-            >
-              Pay Now
-            </button>
-          )}
-          {
-            order.status !=="APPROVED" && order.status !== "PENDING" && order.status!=="COMPLETED" && (
-              <button
-                className="btn btn-secondary btn-sm rounded-pill"
-                disabled
-              >
-                N/A
-              </button>
-            )
-          }
-          {
-            order.status === "COMPLETED" && !order.returned && order.endDate < new Date().toISOString().split("T")[0] && (
-              <button className="btn btn-warning btn-sm rounded-pill" onClick={()=>handleReturnEquipment(order.bookingId)}>
-                Return Equipment
-              </button>
-            )
-          }
+          {returnActionButton(order)}
         </>
       ),
     },
@@ -228,7 +228,17 @@ const OrderPage = ({ isSidebarOpen }) => {
           Authorization:`Bearer ${cookies.jwtToken}`
         }
       })
-
+      const newOrders = orders.map(order => {
+        if(order.bookingId === orderId){
+          return {
+            ...order,
+            returned:true
+          }
+        }
+        return order;
+      })
+      setOrders(newOrders);
+      setError(null);
       alert(response.data);
     }
     catch(err){
