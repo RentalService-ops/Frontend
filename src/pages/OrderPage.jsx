@@ -206,7 +206,7 @@ const OrderPage = ({ isSidebarOpen }) => {
             )
           }
           {
-            order.status === "COMPLETED" && order.endDate < new Date().toISOString().split("T")[0] && (
+            order.status === "COMPLETED" && !order.returned && order.endDate < new Date().toISOString().split("T")[0] && (
               <button className="btn btn-warning btn-sm rounded-pill" onClick={()=>handleReturnEquipment(order.bookingId)}>
                 Return Equipment
               </button>
@@ -223,16 +223,17 @@ const OrderPage = ({ isSidebarOpen }) => {
 
   async function handleReturnEquipment(orderId){
     try{
-      await axios.put(`http://localhost:8080/api/bookings/${orderId}/return`,{},{
+     const response = await axios.put(`http://localhost:8080/api/bookings/${orderId}/return`,{},{
         headers:{
           Authorization:`Bearer ${cookies.jwtToken}`
         }
       })
+
       alert(response.data);
     }
     catch(err){
-      console.log(err.response)
-      alert(err.response);
+      console.log(err)
+      alert(err);
     }
   }
   const fetchOrders = async () => {
@@ -250,6 +251,7 @@ const OrderPage = ({ isSidebarOpen }) => {
           withCredentials: true,
         }
       );
+      
       if(!_.isEqual(response.data,orders)){
       setOrders(response.data);
       setError(null);
