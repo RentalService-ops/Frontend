@@ -37,7 +37,7 @@ const AdminEquipment = () => {
     setError(null);
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/admin/equipment?page=${page - 1}&size=${productsPerPage}&search=${search}`, // Adjusted for 1-based indexing
+        `http://localhost:8080/api/admin/equipment?page=${page - 1}&size=${productsPerPage}&search=${search}`,
         {
           headers: {
             Authorization: `Bearer ${cookie.jwtToken}`,

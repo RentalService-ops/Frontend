@@ -158,10 +158,10 @@ const AdminQueries = () => {
                           <Button
                             variant="success"
                             size="sm"
-                            onClick={() => handleMarkResolved(query.id)}
-                            disabled={resolvingQuery === query.id}
+                            onClick={() => handleMarkResolved(query.query_id)}
+                            disabled={resolvingQuery === query.query_id}
                           >
-                            {resolvingQuery === query.id ? (
+                            {resolvingQuery === query.query_id ? (
                               <>
                                 <Spinner
                                   as="span"

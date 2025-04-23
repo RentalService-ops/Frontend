@@ -122,15 +122,14 @@ export default function ProfilePage() {
 <Col lg="4">
   <Card className="mb-4 text-center shadow">
     <Card.Body>
-      <Card.Img
-        src="https://img.freepik.com/premium-psd/smiling-3d-cartoon-man_975163-772.jpg?semt=ais_hybrid&w=740"
-        alt="User Avatar"
-        className="rounded-circle"
-        style={{ width: "150px" }}
-      />
-      <p className="text-muted mb-1 fw-bold">{user.username}</p>
-      <p className="text-muted mb-1">{user.email}</p> {/* Moved email here */}
-      <p className="text-muted mb-3">{user.phoneNo}</p> {/* Moved phone number here */}
+      <h1>My Profile</h1>
+      <br />
+      <h5 className="text-muted mb-1 ">Name: {user.username}</h5>
+      <hr />
+      <h5 className="text-muted mb-1">Email: {user.email}</h5> {/* Moved email here */}
+      <hr />
+      <h5 className="text-muted mb-3">Phone Number: {user.phoneNo}</h5> {/* Moved phone number here */}
+      <hr />
       <Button variant="primary" onClick={() => setShowProfileModal(true)}>
         Edit Profile
       </Button>
@@ -158,8 +157,8 @@ export default function ProfilePage() {
                     addresses.map((address) => (
                       <div key={address.id} className="mb-3 d-flex justify-content-between align-items-center">
                         <div>
-                          <p className="mb-1">{address.street}, {address.city}</p>
-                          <p className="text-muted">{address.country}, {address.zipCode}</p>
+                          <p className="mb-1">{address.street}, {address.city}, {address.state+ "(Pin Code: "+`${address.zipCode})`}</p>
+                          <p className="text-muted">{address.country}</p>
                         </div>
                         <div>
                           <Button

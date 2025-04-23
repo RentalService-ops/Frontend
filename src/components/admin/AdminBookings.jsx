@@ -52,7 +52,6 @@ const AdminBookings = () => {
           headers: { Authorization: `Bearer ${cookie.jwtToken}` },
         }
       );
-      console.log(response.data.content);
       setBookings(response.data.content.content);                                                    
       setTotalPages(response.data.totalPages);
     } catch (error) {
