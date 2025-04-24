@@ -21,9 +21,23 @@ const OrderPage = ({ isSidebarOpen }) => {
   const decodedToken = token ? jwtDecode(token) : {};
   const userId = decodedToken.user_id;
 
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState([]);
+
+  const [updateForm, setUpdateForm] = useState({
+    bookingId: null,
+    equipmentQuantity: 1,
+    startDate: "",
+    endDate: "",
+    status: "PENDING",
+  });
+
+
   useEffect(() => {
     localStorage.setItem("failedPaymentAttempts", 0);
-  },[]);
+  }, []);
+
+
 
   const loadRazorpayScript = () => {//displays the Razorpay UI for payment.
     return new Promise((resolve) => {
@@ -67,7 +81,7 @@ const OrderPage = ({ isSidebarOpen }) => {
         order_id: razorpayOrder.id,
         handler: async function (response) {
           try {
-              await axios.post(
+            await axios.post(
               "http://localhost:8080/api/payments/verify-payment",
               {
                 paymentId: response.razorpay_payment_id,
@@ -94,33 +108,33 @@ const OrderPage = ({ isSidebarOpen }) => {
           ondismiss: async function () {
             const failedPaymentAttempts = parseInt(localStorage.getItem("failedPaymentAttempts")) || 0;
             if (failedPaymentAttempts < 2) {
-              try{
-                const response1 =await axios.post(`http://localhost:8080/api/payments/failed-payment/${response.data.id}`, {}, {
+              try {
+                const response1 = await axios.post(`http://localhost:8080/api/payments/failed-payment/${response.data.id}`, {}, {
                   headers: { Authorization: `Bearer ${token}` },
                   withCredentials: true,
                 })
                 localStorage.setItem("failedPaymentAttempts", failedPaymentAttempts + 1);
                 alert(response1.data);
               }
-              catch(err){
+              catch (err) {
                 console.log("Error in failed payment:", err);
               }
             } else {
-                try {
-                  
-              const response1 = await axios.post(`http://localhost:8080/api/payments/reject-payment/${response.data.id}`,{},{
-                headers:{ Authorization: `Bearer ${token}` },
-                withCredentials: true,
-              })
+              try {
 
-              alert(response1.data);
-              localStorage.removeItem("failedPaymentAttempts");
-                } catch (error) {
-                  console.error("Error in rejecting payment:", error);
-                }
-              
+                const response1 = await axios.post(`http://localhost:8080/api/payments/reject-payment/${response.data.id}`, {}, {
+                  headers: { Authorization: `Bearer ${token}` },
+                  withCredentials: true,
+                })
+
+                alert(response1.data);
+                localStorage.removeItem("failedPaymentAttempts");
+              } catch (error) {
+                console.error("Error in rejecting payment:", error);
+              }
+
+            }
           }
-        }
         },
         prefill: {
           name: decodedToken.name || "User",
@@ -138,39 +152,80 @@ const OrderPage = ({ isSidebarOpen }) => {
       alert("Something went wrong with payment.");
     }
   };
-  function returnActionButton(order){
-    let returnButton;
-    if(order.status === "PENDING"){
-      returnButton=<button
-      className="btn btn-danger btn-sm rounded-pill me-2"
-      onClick={() => handleCancelClick(order.bookingId)}
-    >
-      Cancel
-    </button>
+
+
+  function returnActionButton(order) {
+    if (order.status === "PENDING") {
+      return (
+        <>
+          <button
+            className="btn btn-info btn-sm rounded-pill me-2"
+            onClick={() => {
+
+              setSelectedProduct(order);
+
+              setShowUpdateModal(true);
+            }}          >
+            Update
+          </button>
+          <button
+            className="btn btn-danger btn-sm rounded-pill"
+            onClick={() => handleCancelClick(order.bookingId)}
+          >
+            Cancel
+          </button>
+        </>
+      );
+    } else if (order.status === "APPROVED") {
+      return (
+        <button
+          className="btn btn-success btn-sm rounded-pill"
+          onClick={() => handlePayNow(order)}
+        >
+          Pay Now
+        </button>
+      );
+    } else if (
+      order.status === "COMPLETED" &&
+      !order.returned &&
+      order.endDate < new Date().toISOString().split("T")[0]
+    ) {
+      return (
+        <button
+          className="btn btn-warning btn-sm rounded-pill"
+          onClick={() => handleReturnEquipment(order.bookingId)}
+        >
+          Return Equipment
+        </button>
+      );
+    } else {
+      return (
+        <button className="btn btn-secondary btn-sm rounded-pill" disabled>
+          N/A
+        </button>
+      );
     }
-    else if(order.status==="APPROVED"){
-      returnButton=<button
-      className="btn btn-success btn-sm rounded-pill"
-      onClick={() => handlePayNow(order)}
-    >
-      Pay Now
-    </button>
-    }
-    else if(order.status === "COMPLETED" && !order.returned && order.endDate < new Date().toISOString().split("T")[0]){
-      returnButton=<button className="btn btn-warning btn-sm rounded-pill" onClick={()=>handleReturnEquipment(order.bookingId)}>
-      Return Equipment
-    </button>
-    }
-    else{
-      returnButton=<button
-      className="btn btn-secondary btn-sm rounded-pill"
-      disabled
-    >
-      N/A
-    </button>
-    }
-    return returnButton;
   }
+  const updateOrder = async () => {
+    try {
+      // const token = localStorage.getItem("jwtToken");
+
+      await axios.put(
+        `http://localhost:8080/api/bookings/updateBooking`,
+        updateForm,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
+      alert("Booking updated successfully!");
+      setShowUpdateModal(false);
+      fetchOrders(); // refresh orders
+    } catch (err) {
+      alert("Failed to update booking.");
+    }
+  };
+
   const config = [
     {
       label: "Sr No.",
@@ -199,7 +254,7 @@ const OrderPage = ({ isSidebarOpen }) => {
     },
     {
       label: "Total Cost",
-      render: (order) => order.totalAmount.toFixed(2),
+      render: (order) => order?.totalAmount ? order.totalAmount.toFixed(2) : '0.00',
     },
     {
       label: "Status",
@@ -219,20 +274,20 @@ const OrderPage = ({ isSidebarOpen }) => {
 
   useEffect(() => {
     fetchOrders();
-  }, [cookies,orders]);
+  }, [cookies, orders]);
 
-  async function handleReturnEquipment(orderId){
-    try{
-     const response = await axios.put(`http://localhost:8080/api/bookings/${orderId}/return`,{},{
-        headers:{
-          Authorization:`Bearer ${cookies.jwtToken}`
+  async function handleReturnEquipment(orderId) {
+    try {
+      const response = await axios.put(`http://localhost:8080/api/bookings/${orderId}/return`, {}, {
+        headers: {
+          Authorization: `Bearer ${cookies.jwtToken}`
         }
       })
       const newOrders = orders.map(order => {
-        if(order.bookingId === orderId){
+        if (order.bookingId === orderId) {
           return {
             ...order,
-            returned:true
+            returned: true
           }
         }
         return order;
@@ -241,7 +296,7 @@ const OrderPage = ({ isSidebarOpen }) => {
       setError(null);
       alert(response.data);
     }
-    catch(err){
+    catch (err) {
       console.log(err)
       alert(err);
     }
@@ -261,10 +316,10 @@ const OrderPage = ({ isSidebarOpen }) => {
           withCredentials: true,
         }
       );
-      
-      if(!_.isEqual(response.data,orders)){
-      setOrders(response.data);
-      setError(null);
+
+      if (!_.isEqual(response.data, orders)) {
+        setOrders(response.data);
+        setError(null);
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -337,6 +392,20 @@ const OrderPage = ({ isSidebarOpen }) => {
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
 
+
+
+  useEffect(() => {
+    if (showUpdateModal && selectedProduct) {
+      setUpdateForm({
+        bookingId: selectedProduct.bookingId || null,
+        equipmentQuantity: selectedProduct.equipmentQuantity || 1,
+        startDate: selectedProduct.startDate || "",
+        endDate: selectedProduct.endDate || "",
+        status: selectedProduct.status || "PENDING",
+      });
+    }
+  }, [showUpdateModal, selectedProduct]);
+
   return (
     <>
       <div
@@ -357,9 +426,8 @@ const OrderPage = ({ isSidebarOpen }) => {
               {["ALL", ...bookingStatuses].map((status) => (
                 <button
                   key={status}
-                  className={`btn ${
-                    activeTab === status ? "btn-primary" : "btn-outline-primary"
-                  } rounded-pill px-3 py-1`}
+                  className={`btn ${activeTab === status ? "btn-primary" : "btn-outline-primary"
+                    } rounded-pill px-3 py-1`}
                   onClick={() => setActiveTab(status)}
                 >
                   {status}
@@ -394,6 +462,7 @@ const OrderPage = ({ isSidebarOpen }) => {
         )}
       </div>
 
+      {/* Cancel Order Modal */}
       {showModal && (
         <>
           <div
@@ -434,8 +503,103 @@ const OrderPage = ({ isSidebarOpen }) => {
           <div className="modal-backdrop fade show"></div>
         </>
       )}
+
+      {showUpdateModal && selectedProduct && (
+        <div className="modal show d-block" tabIndex="-1" role="dialog">
+          <div className="modal-dialog modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Update Booking</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowUpdateModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <label htmlFor="equipmentQuantity" className="form-label">
+                    Equipment Quantity
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    id="equipmentQuantity"
+                    min="1"
+                    value={updateForm.equipmentQuantity}
+                    onChange={(e) =>
+                      setUpdateForm((prev) => ({
+                        ...prev,
+                        equipmentQuantity: parseInt(e.target.value, 10),
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="startDate" className="form-label">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    id="startDate"
+                    value={updateForm.startDate}
+                    onChange={(e) =>
+                      setUpdateForm((prev) => ({
+                        ...prev,
+                        startDate: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="endDate" className="form-label">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    id="endDate"
+                    value={updateForm.endDate}
+                    onChange={(e) =>
+                      setUpdateForm((prev) => ({
+                        ...prev,
+                        endDate: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowUpdateModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-success"
+                  onClick={updateOrder}
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
     </>
   );
+
 };
 
 export default OrderPage;
