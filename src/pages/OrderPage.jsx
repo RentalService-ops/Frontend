@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import Pagination from "../layout/Pagination";
 import Table from "../components/Table";
 import _ from 'lodash';
+import UpdateBookingModal from "../components/UpdateBookingModal";
 
 const OrderPage = ({ isSidebarOpen }) => {
   const [cookies] = useCookies(["jwtToken"]);
@@ -30,6 +31,8 @@ const OrderPage = ({ isSidebarOpen }) => {
     startDate: "",
     endDate: "",
     status: "PENDING",
+    totalAmount: 0,
+    addressDTO: { id: 0 }
   });
 
 
@@ -158,24 +161,27 @@ const OrderPage = ({ isSidebarOpen }) => {
     if (order.status === "PENDING") {
       return (
         <>
-          <button
-            className="btn btn-info btn-sm rounded-pill me-2"
-            onClick={() => {
+          <div className="d-flex justify-content-start gap-2">
+            <button
+              className="btn btn-info btn-sm rounded-pill"
+              onClick={() => {
 
-              setSelectedProduct(order);
-
-              setShowUpdateModal(true);
-            }}          >
-            Update
-          </button>
-          <button
-            className="btn btn-danger btn-sm rounded-pill"
-            onClick={() => handleCancelClick(order.bookingId)}
-          >
-            Cancel
-          </button>
+                setSelectedProduct(order);
+                setShowUpdateModal(true);
+              }}
+            >
+              Update
+            </button>
+            <button
+              className="btn btn-danger btn-sm rounded-pill"
+              onClick={() => handleCancelClick(order.bookingId)}
+            >
+              Cancel
+            </button>
+          </div>
         </>
       );
+
     } else if (order.status === "APPROVED") {
       return (
         <button
@@ -208,7 +214,6 @@ const OrderPage = ({ isSidebarOpen }) => {
   }
   const updateOrder = async () => {
     try {
-      // const token = localStorage.getItem("jwtToken");
 
       await axios.put(
         `http://localhost:8080/api/bookings/updateBooking`,
@@ -235,6 +240,10 @@ const OrderPage = ({ isSidebarOpen }) => {
     {
       label: "Equipment Name",
       render: (order) => order.equipmentName,
+    },
+    {
+      label: "Delevery Address",
+      render: (order) => order.addressDTO?.street + " " + order.addressDTO?.city,
     },
     {
       label: "Rental Period",
@@ -396,12 +405,16 @@ const OrderPage = ({ isSidebarOpen }) => {
 
   useEffect(() => {
     if (showUpdateModal && selectedProduct) {
+
+
       setUpdateForm({
         bookingId: selectedProduct.bookingId || null,
         equipmentQuantity: selectedProduct.equipmentQuantity || 1,
         startDate: selectedProduct.startDate || "",
         endDate: selectedProduct.endDate || "",
         status: selectedProduct.status || "PENDING",
+        totalAmount: selectedProduct.totalAmount || 0,
+        addressDTO: { id: parseInt(selectedProduct.addressDTO?.id) || 0 },
       });
     }
   }, [showUpdateModal, selectedProduct]);
@@ -504,97 +517,16 @@ const OrderPage = ({ isSidebarOpen }) => {
         </>
       )}
 
-      {showUpdateModal && selectedProduct && (
-        <div className="modal show d-block" tabIndex="-1" role="dialog">
-          <div className="modal-dialog modal-dialog-centered" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Update Booking</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowUpdateModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <label htmlFor="equipmentQuantity" className="form-label">
-                    Equipment Quantity
-                  </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="equipmentQuantity"
-                    min="1"
-                    value={updateForm.equipmentQuantity}
-                    onChange={(e) =>
-                      setUpdateForm((prev) => ({
-                        ...prev,
-                        equipmentQuantity: parseInt(e.target.value, 10),
-                      }))
-                    }
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="startDate" className="form-label">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    id="startDate"
-                    value={updateForm.startDate}
-                    onChange={(e) =>
-                      setUpdateForm((prev) => ({
-                        ...prev,
-                        startDate: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="endDate" className="form-label">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    id="endDate"
-                    value={updateForm.endDate}
-                    onChange={(e) =>
-                      setUpdateForm((prev) => ({
-                        ...prev,
-                        endDate: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
+      <UpdateBookingModal
+        show={showUpdateModal}
+        selectedProduct={selectedProduct}
+        updateForm={updateForm}
+        setUpdateForm={setUpdateForm}
+        onClose={() => setShowUpdateModal(false)}
+        onSubmit={updateOrder}
+      />
 
 
-              </div>
-
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowUpdateModal(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-success"
-                  onClick={updateOrder}
-                >
-                  Save Changes
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
 
     </>

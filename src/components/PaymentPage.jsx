@@ -4,13 +4,14 @@ import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
 import { FaMoneyCheckAlt } from "react-icons/fa";
 import Pagination from "../layout/Pagination";
-import _ from 'lodash';
+import _ from "lodash";
+
 const PaymentPage = () => {
   const [payments, setPayments] = useState([]);
   const [filteredPayments, setFilteredPayments] = useState([]);
   const [sortOption, setSortOption] = useState("desc");
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 8;
+  const productsPerPage = 6;
   const [cookies] = useCookies(["jwtToken"]);
 
   useEffect(() => {
@@ -25,9 +26,7 @@ const PaymentPage = () => {
             },
           }
         );
-        if(!_.isEqual(response.data)){
-          setPayments(response.data);
-        }
+        setPayments(response.data);
       } catch (error) {
         console.error("Failed to fetch payments:", error);
       }
@@ -36,7 +35,7 @@ const PaymentPage = () => {
     if (cookies.jwtToken) {
       fetchPayments();
     }
-  }, [cookies.jwtToken,payments]);
+  }, [cookies.jwtToken]);
 
   useEffect(() => {
     let sorted = [...payments];
@@ -56,7 +55,7 @@ const PaymentPage = () => {
     }
 
     setFilteredPayments(sorted);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset the page to 1 whenever the payments or sort option change
   }, [payments, sortOption]);
 
   const indexOfLast = currentPage * productsPerPage;
@@ -106,7 +105,11 @@ const PaymentPage = () => {
                 </div>
                 <div>
                   <strong>Status:</strong>{" "}
-                  <span className={`badge ${payment.status === "PAID" ? "bg-success" : "bg-danger"}`}>
+                  <span
+                    className={`badge ${
+                      payment.status === "PAID" ? "bg-success" : "bg-danger"
+                    }`}
+                  >
                     {payment.status}
                   </span>
                   <br />
@@ -114,7 +117,9 @@ const PaymentPage = () => {
                     {new Date(payment.paymentDate).toLocaleDateString()}
                   </small>
                 </div>
-                <div className="fw-bold text-end text-primary">₹ {payment.amount}</div>
+                <div className="fw-bold text-end text-primary">
+                  ₹ {payment.amount}
+                </div>
               </li>
             ))}
           </ul>
@@ -134,3 +139,4 @@ const PaymentPage = () => {
 };
 
 export default PaymentPage;
+
