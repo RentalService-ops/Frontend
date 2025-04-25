@@ -25,7 +25,7 @@ import EmailVerification from "./components/EmailVerification";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [cookies, setCookies] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(localStorage.getItem("sidebarIsOpen") || false);
 
   useEffect(() => {
     const token = document.cookie?.split("=")[1];
@@ -37,7 +37,8 @@ function App() {
   }, []);
 
   const toggleSidebar = () => {
-    setIsSidebarOpen((prev) => !prev); 
+    setIsSidebarOpen((prev) => !prev);
+    localStorage.setItem("sidebarIsOpen",!isSidebarOpen);
   };
 
   const getHomeRoute = () => {

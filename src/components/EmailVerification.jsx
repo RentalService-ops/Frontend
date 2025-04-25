@@ -26,6 +26,8 @@ export default function EmailVerification() {
         }
     }
 
+    
+
     function handleModalClose() {
         setShowModal(false);
         navigate("/forgot-password");

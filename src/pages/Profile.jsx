@@ -30,7 +30,9 @@ export default function ProfilePage() {
         const decodedToken = jwtDecode(cookies.jwtToken);
         setUserId(decodedToken.user_id);
         fetchUserDetails(decodedToken.user_id);
+        if(decodedToken.role === "user"){
         fetchUserAddresses(decodedToken.user_id);
+        }
       } catch (error) {
         console.error("Error decoding token:", error);
       }
@@ -43,7 +45,7 @@ export default function ProfilePage() {
     try {
       const response = await axios.get(`http://localhost:8080/api/user/getUser`, {
         headers: { Authorization: `Bearer ${cookies.jwtToken}` },
-        params:{id:`${id}`},
+        params: { id: `${id}` },
         withCredentials: true,
       });
       setUser(response.data);
@@ -66,12 +68,12 @@ export default function ProfilePage() {
 
   const handleUpdateProfile = async () => {
     console.log(formData);
-    
+
     try {
       await axios.put(`http://localhost:8080/api/user/updateUser`, formData, {
         headers: { Authorization: `Bearer ${cookies.jwtToken}` },
-        params:{
-            id:`${userId}`
+        params: {
+          id: `${userId}`
         }
       });
       setShowProfileModal(false);
@@ -80,7 +82,7 @@ export default function ProfilePage() {
       console.error("Error updating profile", error);
     }
   };
-  
+
 
   const handleAddOrEditAddress = async () => {
     try {
@@ -119,31 +121,31 @@ export default function ProfilePage() {
         {user && (
           <Row>
 
-<Col lg="4">
-  <Card className="mb-4 text-center shadow">
-    <Card.Body>
-      <h1>My Profile</h1>
-      <br />
-      <h5 className="text-muted mb-1 ">Name: {user.username}</h5>
-      <hr />
-      <h5 className="text-muted mb-1">Email: {user.email}</h5> {/* Moved email here */}
-      <hr />
-      <h5 className="text-muted mb-3">Phone Number: {user.phoneNo}</h5> {/* Moved phone number here */}
-      <hr />
-      <Button variant="primary" onClick={() => setShowProfileModal(true)}>
-        Edit Profile
-      </Button>
-    </Card.Body>
-  </Card>
-</Col>
+            <Col lg={jwtDecode(cookies.jwtToken).role !=="user" ? 12 : 4} className={jwtDecode(cookies.jwtToken).role !=="user" && "d-flex justify-content-center align-items-center"}>
+              <Card className="mb-4 text-center shadow">
+                <Card.Body>
+                  <h1>My Profile</h1>
+                  <br />
+                  <h5 className="text-muted mb-1 ">Name: {user.username}</h5>
+                  <hr />
+                  <h5 className="text-muted mb-1">Email: {user.email}</h5>
+                  <hr />
+                  <h5 className="text-muted mb-3">Phone Number: {user.phoneNo}</h5>
+                  <hr />
+                  <Button variant="primary" onClick={() => setShowProfileModal(true)}>
+                    Edit Profile
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
 
-            <Col lg="8">
+            {jwtDecode(cookies.jwtToken).role === "user" && <Col lg="8">
               <Card className="shadow">
                 <Card.Body>
                   <h5 className="fw-bold d-flex justify-content-between">
                     Address Details
-                    <Button 
-                      variant="success" 
+                    <Button
+                      variant="success"
                       onClick={() => {
                         setEditingAddressId(null);
                         setAddressData({ street: "", city: "", state: "", zipCode: "", country: "" });
@@ -157,7 +159,7 @@ export default function ProfilePage() {
                     addresses.map((address) => (
                       <div key={address.id} className="mb-3 d-flex justify-content-between align-items-center">
                         <div>
-                          <p className="mb-1">{address.street}, {address.city}, {address.state+ "(Pin Code: "+`${address.zipCode})`}</p>
+                          <p className="mb-1">{address.street}, {address.city}, {address.state + "(Pin Code: " + `${address.zipCode})`}</p>
                           <p className="text-muted">{address.country}</p>
                         </div>
                         <div>
@@ -191,7 +193,7 @@ export default function ProfilePage() {
                   )}
                 </Card.Body>
               </Card>
-            </Col>
+            </Col>}
           </Row>
         )}
 
@@ -208,10 +210,10 @@ export default function ProfilePage() {
               {Object.keys(addressData).filter((field) => field !== "id").map((field) => (
                 <Form.Group key={field} className="mb-2">
                   <Form.Label>{field.charAt(0).toUpperCase() + field.slice(1)}</Form.Label>
-                  <Form.Control 
-                    type="text" 
-                    value={addressData[field]} 
-                    onChange={(e) => setAddressData({ ...addressData, [field]: e.target.value })} 
+                  <Form.Control
+                    type="text"
+                    value={addressData[field]}
+                    onChange={(e) => setAddressData({ ...addressData, [field]: e.target.value })}
                   />
                 </Form.Group>
               ))}
@@ -231,49 +233,49 @@ export default function ProfilePage() {
           </Modal.Footer>
         </Modal>
 
-<Modal show={showProfileModal} onHide={() => setShowProfileModal(false)} centered>
-  <Modal.Header closeButton>
-    <Modal.Title>Edit Profile</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <Form>
-      <Form.Group className="mb-2">
-        <Form.Label>Username</Form.Label>
-        <Form.Control
-          type="text"
-          value={formData.username || ""}
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-        />
-      </Form.Group>
+        <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Profile</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group className="mb-2">
+                <Form.Label>Username</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={formData.username || ""}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                />
+              </Form.Group>
 
-      <Form.Group className="mb-2">
-        <Form.Label>Email</Form.Label>
-        <Form.Control
-          type="email"
-          value={formData.email || ""}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        />
-      </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  value={formData.email || ""}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+              </Form.Group>
 
-      <Form.Group className="mb-2">
-        <Form.Label>Phone Number</Form.Label>
-        <Form.Control
-          type="text"
-          value={formData.phoneNo || ""}
-          onChange={(e) => setFormData({ ...formData, phoneNo: e.target.value })}
-        />
-      </Form.Group>
-    </Form>
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="secondary" onClick={() => setShowProfileModal(false)}>
-      Cancel
-    </Button>
-    <Button variant="primary" onClick={handleUpdateProfile}>
-      Save Changes
-    </Button>
-  </Modal.Footer>
-</Modal>
+              <Form.Group className="mb-2">
+                <Form.Label>Phone Number</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={formData.phoneNo || ""}
+                  onChange={(e) => setFormData({ ...formData, phoneNo: e.target.value })}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowProfileModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleUpdateProfile}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
 
         <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
           <Modal.Header closeButton>

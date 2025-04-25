@@ -6,6 +6,7 @@ export default function ForgotPassword() {
     const [showSetPassword, setShowSetPassword] = useState(false);
     const [enteredOTPValue, setEnteredOTPValue] = useState("");
     const [resetPassword, setResetPassword] = useState("");
+    const [isLoading,setIsLoading]=useState(false);
     const [confirmResetPassword, setConfirmResetPassword] = useState("");
     const navigate = useNavigate();
 
@@ -35,6 +36,22 @@ export default function ForgotPassword() {
             console.log(err);
         } finally {
             setEnteredOTPValue("");
+        }
+    }
+
+    async function handleResetOTPClick() {
+        setIsLoading(true);
+        try {
+            await axios.get(`http://localhost:8080/otp`, {
+                params: {
+                    useremail: localStorage.getItem("email")
+                }
+            });
+            setShowModal(true);
+        } catch (err) {
+            console.error(err.message);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -117,9 +134,21 @@ export default function ForgotPassword() {
                                 required
                             />
                         </div>
-                        <button className="btn btn-primary w-100" onClick={handleClick}>
+                        <div className="d-flex justify-content-between">
+                        <button className="btn btn-primary" onClick={handleClick}>
                             Verify OTP
                         </button>
+                        <button className="btn btn-primary" onClick={handleResetOTPClick}>
+                        {isLoading ? (
+                            <>
+                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Sending...
+                            </>
+                        ) : (
+                            "Reset OTP"
+                        )}
+                        </button>
+                        </div>
                     </>
                 )}
             </div>
