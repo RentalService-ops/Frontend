@@ -81,7 +81,7 @@ const AdminEquipment = () => {
             <InputGroup>
               <Form.Control
                 type="text"
-                placeholder="Search equipment by name, category or owner..."
+                placeholder="Search equipment by name"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />

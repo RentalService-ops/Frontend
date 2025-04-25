@@ -1,23 +1,24 @@
 import { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Table, ProgressBar, Button } from "react-bootstrap";
+import { Container, Row, Col, Card, Table, ProgressBar } from "react-bootstrap";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { 
   Users, Package, ClipboardList, MessageCircle, 
-  TrendingUp, Calendar, ArrowUp, ArrowDown, 
-  MoreHorizontal, ChevronRight
+ ChevronRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
-    users: { total: 0, trend: 5.2 },
-    equipment: { total: 0, trend: 8.1 },
-    bookings: { total: 0, trend: -2.3 },
-    queries: { total: 0, trend: 3.7 }
+    users: { total: 0 },
+    equipment: { total: 0 },
+    bookings: { total: 0 },
+    queries: { total: 0 }
   });
   
   const [recentBookings, setRecentBookings] = useState([]);
+  const [activities,setActivities]=useState([]);
+  const [categories,setCategories]=useState([]);
   const [loading, setLoading] = useState(true);
   const [cookie] = useCookies();
 
@@ -39,12 +40,37 @@ const AdminDashboard = () => {
         { headers: { Authorization: `Bearer ${cookie.jwtToken}` } }
       );
 
+      const activityResponse = await axios.get(
+        "http://localhost:8080/api/notification",
+        {headers:{Authorization:`Bearer ${cookie.jwtToken}`}}
+      );
+
+      const equipmentResponse=await axios.get(
+        `http://localhost:8080/api/equipment/getAllEquipments`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookie.jwtToken}`,
+          },
+        }
+      );
+
+      const queryResponse=await axios.get(
+        `http://localhost:8080/api/admin/queries/pending`,
+        {
+          headers: {
+            Authorization: `Bearer ${cookie.jwtToken}`
+          }
+        }
+      );
+
       setStats(prev => ({
         ...prev,
         users: { ...prev.users, total: userResponse.data.totalItems || 0 },
-        bookings: { ...prev.bookings, total: bookingsResponse.data.totalBookings || 0 }
+        bookings: { ...prev.bookings, total: bookingsResponse.data.totalBookings || 0 },
+        equipment:{...prev.equipment,total:equipmentResponse.data.length || 0},
+        queries:{...prev.queries,total:queryResponse.data.length || 0}
       }));
-
+      setActivities(activityResponse.data);
       setRecentBookings(bookingsResponse.data.recentbookings || []);
       
     } catch (error) {
@@ -59,7 +85,6 @@ const AdminDashboard = () => {
     { 
       title: "Total Users", 
       value: stats.users.total, 
-      trend: stats.users.trend, 
       icon: <Users size={24} />, 
       color: "primary",
       link: "/admin/users"
@@ -67,7 +92,6 @@ const AdminDashboard = () => {
     { 
       title: "Total Equipment", 
       value: stats.equipment.total, 
-      trend: stats.equipment.trend, 
       icon: <Package size={24} />, 
       color: "success",
       link: "/admin/equipments"
@@ -75,7 +99,6 @@ const AdminDashboard = () => {
     { 
       title: "Total Bookings", 
       value: stats.bookings.total, 
-      trend: stats.bookings.trend, 
       icon: <ClipboardList size={24} />, 
       color: "warning",
       link: "/admin/bookings"
@@ -83,7 +106,6 @@ const AdminDashboard = () => {
     { 
       title: "Pending Queries", 
       value: stats.queries.total, 
-      trend: stats.queries.trend, 
       icon: <MessageCircle size={24} />, 
       color: "danger",
       link: "/admin/queries"
@@ -98,25 +120,10 @@ const AdminDashboard = () => {
     { name: "Others", percentage: 5 }
   ];
 
-  const recentActivities = [
-    { id: 1, action: "New user registered", time: "10 minutes ago", user: "Bhavik Kumar" },
-    { id: 2, action: "Equipment added", time: "1 hour ago", user: "Vipul Sahani" },
-    { id: 3, action: "Booking approved", time: "2 hours ago", user: "Nehal" },
-    { id: 4, action: "Query resolved", time: "3 hours ago", user: "Admin" },
-  ];
-
   return (
     <Container fluid>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">Dashboard</h2>
-        <div>
-          <Button variant="outline-secondary" className="me-2">
-            <Calendar size={18} className="me-2" /> Filter by Date
-          </Button>
-          <Button variant="primary">
-            <TrendingUp size={18} className="me-2" /> Generate Report
-          </Button>
-        </div>
       </div>
       
       <Row className="g-3 mb-4">
@@ -129,11 +136,6 @@ const AdminDashboard = () => {
                     <p className="text-muted mb-1">{card.title}</p>
                     <h3 className="mb-2">{loading ? "-" : card.value}</h3>
                     <div className={`text-${card.trend > 0 ? 'success' : 'danger'} d-flex align-items-center small`}>
-                      {card.trend > 0 ? 
-                        <ArrowUp size={16} className="me-1" /> : 
-                        <ArrowDown size={16} className="me-1" />
-                      }
-                      <span>{Math.abs(card.trend)}% {card.trend > 0 ? 'increase' : 'decrease'}</span>
                     </div>
                   </div>
                   <div className={`bg-${card.color} bg-opacity-10 p-3 rounded d-flex align-items-center justify-content-center`}>
@@ -244,14 +246,13 @@ const AdminDashboard = () => {
             </Card.Header>
             <Card.Body className="p-0">
               <ul className="list-group list-group-flush">
-                {recentActivities.map((activity) => (
+                {activities.map((activity) => (
                   <li key={activity.id} className="list-group-item px-3 py-3">
                     <div className="d-flex justify-content-between">
                       <div>
-                        <p className="mb-0">{activity.action}</p>
-                        <small className="text-muted">by {activity.user}</small>
+                        <p className="mb-0">{activity.message}</p>
                       </div>
-                      <small className="text-muted">{activity.time}</small>
+                      <small className="text-muted">{new Date().toISOString(activity.timestamp).split("T")[0]} {new Date().toISOString(activity.timestamp).split("T")[1].split(".")[0]}</small>
                     </div>
                   </li>
                 ))}

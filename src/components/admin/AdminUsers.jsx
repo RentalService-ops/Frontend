@@ -40,9 +40,8 @@ const AdminUsers = () => {
           headers: { Authorization: `Bearer ${cookie.jwtToken}` },
         }
       );
-      setUsers(response.data.content);
+      setUsers(response.data.content.filter(u=>u.role !=="admin"));
       setTotalPages(response.data.totalPages);
-
       setStats({
         allUsers: response.data.totalItems,
         totalUsers: response.data.content.filter(u => u.role === "user").length,
@@ -58,7 +57,7 @@ const AdminUsers = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
+    if (window.confirm("Are you sure you want to delete this user?All the data related to this user will be lost.")) {
       try {
         await axios.delete(`http://localhost:8080/api/admin/users/${id}`, {
           headers: { Authorization: `Bearer ${cookie.jwtToken}` },

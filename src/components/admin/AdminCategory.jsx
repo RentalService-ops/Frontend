@@ -19,6 +19,7 @@ const AdminCategory = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalItems,setTotalItems]=useState(0);
   const [search, setSearch] = useState("");
 
   const productsPerPage = 5;
@@ -42,9 +43,9 @@ const AdminCategory = () => {
         `http://localhost:8080/api/admin/categories?page=${currentPage - 1}&size=${productsPerPage}&search=${search}`,
         { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
       );
-
       setCategories(response.data.content);
       setTotalPages(response.data.totalPages);
+      setTotalItems(response.data.totalItems);
     } catch (error) {
       console.error("Error fetching categories:", error);
     } finally {
@@ -72,7 +73,7 @@ const AdminCategory = () => {
             <Card.Body className="d-flex justify-content-between align-items-center">
               <div>
                 <h6 className="text-muted mb-1">Total Categories</h6>
-                <h3 className="mb-0">{categories.length}</h3>
+                <h3 className="mb-0">{totalItems}</h3>
               </div>
               <div className="bg-primary bg-opacity-10 p-3 rounded">
                 <List size={24} />
