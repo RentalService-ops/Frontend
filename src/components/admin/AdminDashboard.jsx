@@ -17,7 +17,6 @@ const AdminDashboard = () => {
   });
   
   const [recentBookings, setRecentBookings] = useState([]);
-  const [activities,setActivities]=useState([]);
   const [categories,setCategories]=useState([]);
   const [loading, setLoading] = useState(true);
   const [cookie] = useCookies();
@@ -40,11 +39,6 @@ const AdminDashboard = () => {
         { headers: { Authorization: `Bearer ${cookie.jwtToken}` } }
       );
 
-      const activityResponse = await axios.get(
-        "http://localhost:8080/api/notification",
-        {headers:{Authorization:`Bearer ${cookie.jwtToken}`}}
-      );
-
       const equipmentResponse=await axios.get(
         `http://localhost:8080/api/equipment/getAllEquipments`,
         {
@@ -63,6 +57,15 @@ const AdminDashboard = () => {
         }
       );
 
+      const categoryResponse=await axios.get(
+        `http://localhost:8080/api/admin/getCategoryAnalytics`,
+        {
+          headers:{
+            Authorization:`Bearer ${cookie.jwtToken}`
+          }
+        }
+      )
+
       setStats(prev => ({
         ...prev,
         users: { ...prev.users, total: userResponse.data.totalItems || 0 },
@@ -70,8 +73,8 @@ const AdminDashboard = () => {
         equipment:{...prev.equipment,total:equipmentResponse.data.length || 0},
         queries:{...prev.queries,total:queryResponse.data.length || 0}
       }));
-      setActivities(activityResponse.data);
       setRecentBookings(bookingsResponse.data.recentbookings || []);
+      setCategories(categoryResponse.data);
       
     } catch (error) {
       console.error("Error fetching dashboard data", error);
@@ -110,14 +113,6 @@ const AdminDashboard = () => {
       color: "danger",
       link: "/admin/queries"
     }
-  ];
-
-  const popularCategories = [
-    { name: "Camera Equipment", percentage: 35 },
-    { name: "Audio Systems", percentage: 25 },
-    { name: "Lighting Equipment", percentage: 20 },
-    { name: "Drones", percentage: 15 },
-    { name: "Others", percentage: 5 }
   ];
 
   return (
@@ -215,17 +210,17 @@ const AdminDashboard = () => {
         <Col lg={4}>
           <Card className="shadow-sm border-0 mb-3">
             <Card.Header className="bg-white py-3">
-              <h5 className="mb-0">Popular Categories</h5>
+              <h5 className="mb-0 text-center">Popular Categories based on Equipments associated with Each Category</h5>
             </Card.Header>
             <Card.Body>
-              {popularCategories.map((category, index) => (
+              {categories.map((category, index) => (
                 <div key={index} className="mb-3">
                   <div className="d-flex justify-content-between mb-1 small">
-                    <span>{category.name}</span>
-                    <span>{category.percentage}%</span>
+                    <span>{category.categoryName}</span>
+                    <span>{Math.floor((category.totalEquipmentsAssociatedWithCategory/stats.equipment.total) *100)}%</span>
                   </div>
                   <ProgressBar 
-                    now={category.percentage} 
+                    now={Math.floor((category.totalEquipmentsAssociatedWithCategory/stats.equipment.total) *100)} 
                     variant={
                       index === 0 ? "primary" :
                       index === 1 ? "success" :
@@ -237,26 +232,6 @@ const AdminDashboard = () => {
                   />
                 </div>
               ))}
-            </Card.Body>
-          </Card>
-          
-          <Card className="shadow-sm border-0">
-            <Card.Header className="bg-white py-3">
-              <h5 className="mb-0">Recent Activities</h5>
-            </Card.Header>
-            <Card.Body className="p-0">
-              <ul className="list-group list-group-flush">
-                {activities.map((activity) => (
-                  <li key={activity.id} className="list-group-item px-3 py-3">
-                    <div className="d-flex justify-content-between">
-                      <div>
-                        <p className="mb-0">{activity.message}</p>
-                      </div>
-                      <small className="text-muted">{new Date().toISOString(activity.timestamp).split("T")[0]} {new Date().toISOString(activity.timestamp).split("T")[1].split(".")[0]}</small>
-                    </div>
-                  </li>
-                ))}
-              </ul>
             </Card.Body>
           </Card>
         </Col>
