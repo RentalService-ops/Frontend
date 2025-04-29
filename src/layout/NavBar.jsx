@@ -40,7 +40,6 @@ const Navbar = ({ toggleSidebar }) => {
       const client = over(socket);//Adding STOMP protocol to web socket.
 
       client.connect({}, () => {
-        console.log("Connected to WebSocket");
 
         client.subscribe(`/topic/booking/${userId}`, (message) => {
           const parsedMessage = JSON.parse(message.body);

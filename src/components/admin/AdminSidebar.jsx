@@ -50,10 +50,13 @@ const AdminSidebar = ({ isExpanded, setIsExpanded }) => {
           <NavLink
             key={index}
             to={item.to}
-            className={({ isActive }) => 
+            className={({ isActive }) =>{
+              return(
               `nav-link py-2 px-3 mb-2 mx-2 d-flex align-items-center rounded transition-all ${
-                isActive ? "bg-primary text-white" : "text-light"
+               isActive ? "bg-primary text-white" : "text-light"
               } ${isExpanded ? "justify-content-start" : "justify-content-center"} sidebar-link`
+            )
+            }
             }
           >
             <span>{item.icon}</span>
