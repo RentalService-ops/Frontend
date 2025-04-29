@@ -2,14 +2,31 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
-import { Container, Row, Col, Card, Button, Modal, Form } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Modal,
+  Form,
+  Tab,
+  Nav,
+  ListGroup,
+} from "react-bootstrap";
 
 export default function ProfilePage() {
   const [cookies] = useCookies(["jwtToken"]);
   const [user, setUser] = useState(null);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [userId, setUserId] = useState(null);
   const [formData, setFormData] = useState({});
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
+  const [addresses, setAddresses] = useState([]);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState(null);
+  const [deletingAddressId, setDeletingAddressId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [addressData, setAddressData] = useState({
     street: "",
     city: "",
@@ -17,285 +34,279 @@ export default function ProfilePage() {
     zipCode: "",
     country: "",
   });
-  const [userId, setUserId] = useState(null);
-  const [addresses, setAddresses] = useState([]);
-  const [editingAddressId, setEditingAddressId] = useState(null);
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletingAddressId, setDeletingAddressId] = useState(null);
+  const isUserRole =
+    cookies.jwtToken && jwtDecode(cookies.jwtToken).role === "user";
 
   useEffect(() => {
     if (cookies.jwtToken) {
-      try {
-        const decodedToken = jwtDecode(cookies.jwtToken);
-        setUserId(decodedToken.user_id);
-        fetchUserDetails(decodedToken.user_id);
-        if(decodedToken.role === "user"){
-        fetchUserAddresses(decodedToken.user_id);
-        }
-      } catch (error) {
-        console.error("Error decoding token:", error);
-      }
-    } else {
-      console.error("JWT Token not found in cookies.");
+      const decoded = jwtDecode(cookies.jwtToken);
+      setUserId(decoded.user_id);
+      fetchUserDetails(decoded.user_id);
+      if (decoded.role === "user") fetchUserAddresses(decoded.user_id);
     }
   }, [cookies.jwtToken]);
 
   const fetchUserDetails = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/user/getUser`, {
-        headers: { Authorization: `Bearer ${cookies.jwtToken}` },
-        params: { id: `${id}` },
-        withCredentials: true,
-      });
-      setUser(response.data);
-      setFormData(response.data);
-    } catch (error) {
-      console.error("Error fetching user details", error);
+      const res = await axios.get(
+        `http://localhost:8080/api/user/getUser?id=${id}`,
+        { headers: { Authorization: `Bearer ${cookies.jwtToken}` } }
+      );
+      setUser(res.data);
+      setFormData(res.data);
+    } catch (err) {
+      console.error("Error fetching user:", err);
     }
   };
 
   const fetchUserAddresses = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/address/getAddressesByUser/${id}`, {
-        headers: { Authorization: `Bearer ${cookies.jwtToken}` },
-      });
-      setAddresses(response.data);
-    } catch (error) {
-      console.error("Error fetching user addresses", error);
+      const res = await axios.get(
+        `http://localhost:8080/api/address/getAddressesByUser/${id}`,
+        { headers: { Authorization: `Bearer ${cookies.jwtToken}` } }
+      );
+      setAddresses(res.data);
+    } catch (err) {
+      console.error("Error fetching addresses:", err);
     }
   };
 
   const handleUpdateProfile = async () => {
-    console.log(formData);
-
     try {
-      await axios.put(`http://localhost:8080/api/user/updateUser`, formData, {
-        headers: { Authorization: `Bearer ${cookies.jwtToken}` },
-        params: {
-          id: `${userId}`
-        }
-      });
+      await axios.put(
+        `http://localhost:8080/api/user/updateUser?id=${userId}`,
+        formData,
+        { headers: { Authorization: `Bearer ${cookies.jwtToken}` } }
+      );
       setShowProfileModal(false);
       fetchUserDetails(userId);
-    } catch (error) {
-      console.error("Error updating profile", error);
+    } catch (err) {
+      console.error("Error updating profile:", err);
     }
   };
-
 
   const handleAddOrEditAddress = async () => {
     try {
       if (editingAddressId) {
-        await axios.put(`http://localhost:8080/api/address/updateAddress/${editingAddressId}`, addressData, {
-          headers: { Authorization: `Bearer ${cookies.jwtToken}` },
-        });
+        await axios.put(
+          `http://localhost:8080/api/address/updateAddress/${editingAddressId}`,
+          addressData,
+          { headers: { Authorization: `Bearer ${cookies.jwtToken}` } }
+        );
       } else {
-        await axios.post(`http://localhost:8080/api/address/addAddress?userId=${userId}`, addressData, {
-          headers: { Authorization: `Bearer ${cookies.jwtToken}` },
-        });
+        await axios.post(
+          `http://localhost:8080/api/address/addAddress?userId=${userId}`,
+          addressData,
+          { headers: { Authorization: `Bearer ${cookies.jwtToken}` } }
+        );
       }
-      setShowAddressModal(false);
-      setAddressData({ street: "", city: "", state: "", zipCode: "", country: "" });
       fetchUserAddresses(userId);
-    } catch (error) {
-      console.error("Error saving address", error);
+      setShowAddressModal(false);
+      resetAddressForm();
+    } catch (err) {
+      console.error("Error saving address:", err);
     }
   };
 
   const handleDeleteAddress = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/address/deleteAddress/${deletingAddressId}`, {
-        headers: { Authorization: `Bearer ${cookies.jwtToken}` },
-      });
-      setShowDeleteModal(false);
+      await axios.delete(
+        `http://localhost:8080/api/address/deleteAddress/${deletingAddressId}`,
+        { headers: { Authorization: `Bearer ${cookies.jwtToken}` } }
+      );
       fetchUserAddresses(userId);
-    } catch (error) {
-      console.error("Error deleting address", error);
+      setShowDeleteModal(false);
+    } catch (err) {
+      console.error("Error deleting address:", err);
     }
   };
 
+  const resetAddressForm = () => {
+    setEditingAddressId(null);
+    setAddressData({
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "",
+    });
+  };
+
   return (
-    <div className="min-vh-100 d-flex flex-column bg-light">
-      <Container className="py-5 mt-5">
-        {user && (
+    <Container style={{ paddingTop: "50px" ,height:"80vh"}}>
+      <Card className="shadow p-4">
+        <h3 className="text-center mb-4">Personal Details</h3>
+        <Tab.Container defaultActiveKey="profile">
           <Row>
-
-            <Col lg={jwtDecode(cookies.jwtToken).role !=="user" ? 12 : 4} className={jwtDecode(cookies.jwtToken).role !=="user" && "d-flex justify-content-center align-items-center"}>
-              <Card className="mb-4 text-center shadow">
-                <Card.Body>
-                  <h1>My Profile</h1>
-                  <br />
-                  <h5 className="text-muted mb-1 ">Name: {user.username}</h5>
-                  <hr />
-                  <h5 className="text-muted mb-1">Email: {user.email}</h5>
-                  <hr />
-                  <h5 className="text-muted mb-3">Phone Number: {user.phoneNo}</h5>
-                  <hr />
-                  <Button variant="primary" onClick={() => setShowProfileModal(true)}>
-                    Edit Profile
-                  </Button>
-                </Card.Body>
-              </Card>
+            <Col md={3}>
+              <Nav variant="pills" className="flex-column">
+                <Nav.Item>
+                  <Nav.Link eventKey="profile">Profile Info</Nav.Link>
+                </Nav.Item>
+                {isUserRole && (
+                  <Nav.Item>
+                    <Nav.Link eventKey="address">My Addresses</Nav.Link>
+                  </Nav.Item>
+                )}
+              </Nav>
             </Col>
-
-            {jwtDecode(cookies.jwtToken).role === "user" && <Col lg="8">
-              <Card className="shadow">
-                <Card.Body>
-                  <h5 className="fw-bold d-flex justify-content-between">
-                    Address Details
-                    <Button
-                      variant="success"
-                      onClick={() => {
-                        setEditingAddressId(null);
-                        setAddressData({ street: "", city: "", state: "", zipCode: "", country: "" });
-                        setShowAddressModal(true);
-                      }}
-                    >
-                      Add Address
-                    </Button>
-                  </h5>
-                  {addresses.length > 0 ? (
-                    addresses.map((address) => (
-                      <div key={address.id} className="mb-3 d-flex justify-content-between align-items-center">
-                        <div>
-                          <p className="mb-1">{address.street}, {address.city}, {address.state + "(Pin Code: " + `${address.zipCode})`}</p>
-                          <p className="text-muted">{address.country}</p>
-                        </div>
-                        <div>
-                          <Button
-                            variant="warning"
-                            size="sm"
-                            className="me-2"
-                            onClick={() => {
-                              setEditingAddressId(address.id);
-                              setAddressData({ ...address });
-                              setShowAddressModal(true);
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => {
-                              setDeletingAddressId(address.id);
-                              setShowDeleteModal(true);
-                            }}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-muted">No addresses found.</p>
+            <Col md={9}>
+              <Tab.Content>
+                <Tab.Pane eventKey="profile">
+                  {user && (
+                    <Card className="border-0">
+                      <Card.Body>
+                        <h5 className="mb-3">Personal Details</h5>
+                        <p><strong>Name:</strong> {user.username}</p>
+                        <p><strong>Email:</strong> {user.email}</p>
+                        <p><strong>Phone:</strong> {user.phoneNo}</p>
+                        <Button onClick={() => setShowProfileModal(true)} variant="primary">
+                          Edit Profile
+                        </Button>
+                      </Card.Body>
+                    </Card>
                   )}
-                </Card.Body>
-              </Card>
-            </Col>}
+                </Tab.Pane>
+
+                <Tab.Pane eventKey="address">
+                  <Card className="border-0">
+                    <Card.Body>
+                      <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Saved Addresses</h5>
+                        <Button
+                          variant="success"
+                          onClick={() => {
+                            resetAddressForm();
+                            setShowAddressModal(true);
+                          }}
+                        >
+                          Add New Address
+                        </Button>
+                      </div>
+                      {addresses.length > 0 ? (
+                        <ListGroup>
+                          {addresses.map((addr) => (
+                            <ListGroup.Item key={addr.id} className="d-flex justify-content-between">
+                              <div>
+                                {addr.street}, {addr.city}, {addr.state} - {addr.zipCode}, {addr.country}
+                              </div>
+                              <div>
+                                <Button
+                                  size="sm"
+                                  variant="warning"
+                                  className="me-2"
+                                  onClick={() => {
+                                    setEditingAddressId(addr.id);
+                                    setAddressData({ ...addr });
+                                    setShowAddressModal(true);
+                                  }}
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="danger"
+                                  onClick={() => {
+                                    setDeletingAddressId(addr.id);
+                                    setShowDeleteModal(true);
+                                  }}
+                                >
+                                  Delete
+                                </Button>
+                              </div>
+                            </ListGroup.Item>
+                          ))}
+                        </ListGroup>
+                      ) : (
+                        <p className="text-muted">No addresses found.</p>
+                      )}
+                    </Card.Body>
+                  </Card>
+                </Tab.Pane>
+              </Tab.Content>
+            </Col>
           </Row>
-        )}
+        </Tab.Container>
+      </Card>
 
-        <Modal show={showAddressModal} onHide={() => {
-          setShowAddressModal(false);
-          setEditingAddressId(null);
-          setAddressData({ street: "", city: "", state: "", zipCode: "", country: "" });
-        }} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>{editingAddressId ? "Edit Address" : "Add Address"}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              {Object.keys(addressData).filter((field) => field !== "id").map((field) => (
-                <Form.Group key={field} className="mb-2">
-                  <Form.Label>{field.charAt(0).toUpperCase() + field.slice(1)}</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={addressData[field]}
-                    onChange={(e) => setAddressData({ ...addressData, [field]: e.target.value })}
-                  />
-                </Form.Group>
-              ))}
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => {
-              setShowAddressModal(false);
-              setEditingAddressId(null);
-              setAddressData({ street: "", city: "", state: "", zipCode: "", country: "" });
-            }}>
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={handleAddOrEditAddress}>
-              {editingAddressId ? "Update Address" : "Save Address"}
-            </Button>
-          </Modal.Footer>
-        </Modal>
+      {/* Profile Modal */}
+      <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Profile</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Username</Form.Label>
+              <Form.Control
+                type="text"
+                value={formData.username || ""}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                value={formData.email || ""}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Phone</Form.Label>
+              <Form.Control
+                type="text"
+                value={formData.phoneNo || ""}
+                onChange={(e) => setFormData({ ...formData, phoneNo: e.target.value })}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowProfileModal(false)}>Cancel</Button>
+          <Button variant="primary" onClick={handleUpdateProfile}>Save</Button>
+        </Modal.Footer>
+      </Modal>
 
-        <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>Edit Profile</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group className="mb-2">
-                <Form.Label>Username</Form.Label>
+      {/* Address Modal */}
+      <Modal show={showAddressModal} onHide={() => setShowAddressModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{editingAddressId ? "Edit Address" : "Add Address"}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            {Object.entries(addressData).slice(1).map(([key, value]) => (
+              <Form.Group className="mb-3" key={key}>
+                <Form.Label>{key.charAt(0).toUpperCase() + key.slice(1)}</Form.Label>
                 <Form.Control
                   type="text"
-                  value={formData.username || ""}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  value={value}
+                  onChange={(e) => setAddressData({ ...addressData, [key]: e.target.value })}
                 />
               </Form.Group>
+            ))}
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowAddressModal(false)}>Cancel</Button>
+          <Button variant="primary" onClick={handleAddOrEditAddress}>
+            {editingAddressId ? "Update" : "Save"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
-              <Form.Group className="mb-2">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  value={formData.email || ""}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-2">
-                <Form.Label>Phone Number</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={formData.phoneNo || ""}
-                  onChange={(e) => setFormData({ ...formData, phoneNo: e.target.value })}
-                />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowProfileModal(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={handleUpdateProfile}>
-              Save Changes
-            </Button>
-          </Modal.Footer>
-        </Modal>
-
-        <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>Confirm Delete</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>Are you sure you want to delete this address?</p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Cancel</Button>
-            <Button variant="danger" onClick={handleDeleteAddress}>Delete</Button>
-          </Modal.Footer>
-        </Modal>
-      </Container>
-    </div>
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this address?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Cancel</Button>
+          <Button variant="danger" onClick={handleDeleteAddress}>Delete</Button>
+        </Modal.Footer>
+      </Modal>
+    </Container>
   );
-
 }
-
-
-
-
-

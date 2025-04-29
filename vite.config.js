@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
   ],
   define: {
-    global: 'globalThis', // ✅ Fix for "global is not defined"
+    global: 'globalThis', //  Fix for "global is not defined"
     'process.env': process.env,
   },
   resolve: {
@@ -23,13 +23,13 @@ export default defineConfig({
   optimizeDeps: {
     esbuildOptions: {
       define: {
-        global: 'globalThis', // ✅ Also needed here
+        global: 'globalThis', //  Also needed here
       },
     },
   },
   build: {
     rollupOptions: {
-      plugins: [nodePolyfills()], // ✅ Add polyfill plugin for Node built-ins
+      plugins: [nodePolyfills()], //  Add polyfill plugin for Node built-ins
     },
   },
 })
