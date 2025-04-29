@@ -68,9 +68,9 @@ const AdminBookings = () => {
       <Card className="shadow-sm">
         <Card.Body>
         <div className="d-flex gap-3">
-          <button className="btn btn-primary" onClick={() => setSearch("Renter")}> Renter </button>
-          <button className="btn btn-primary" onClick={() => setSearch("Equipment")}> Equipment </button>
-          <button className="btn btn-primary" onClick={() => setSearch("User")}> User </button>
+          <button className="btn btn-primary" onClick={() => setSearch("Renter")}>Renter Bookings</button>
+          <button className="btn btn-primary" onClick={() => setSearch("Equipment")}>Equipment Bookings</button>
+          <button className="btn btn-primary" onClick={() => setSearch("User")}>User Bookings</button>
         </div>
 
           {loading ?<Spinner /> :<Table config={config} bookings={bookings}/>}
