@@ -139,6 +139,7 @@ export default function ProfilePage() {
         <h3 className="text-center mb-4">Personal Details</h3>
         <Tab.Container defaultActiveKey="profile">
           <Row>
+
             <Col md={3}>
               <Nav variant="pills" className="flex-column">
                 <Nav.Item>
@@ -148,19 +149,19 @@ export default function ProfilePage() {
                   <Nav.Item>
                     <Nav.Link eventKey="address">My Addresses</Nav.Link>
                   </Nav.Item>
-                )}
+                  )}
               </Nav>
             </Col>
+
             <Col md={9}>
               <Tab.Content>
                 <Tab.Pane eventKey="profile">
                   {user && (
                     <Card className="border-0">
                       <Card.Body>
-                        <h5 className="mb-3">Personal Details</h5>
-                        <p><strong>Name:</strong> {user.username}</p>
-                        <p><strong>Email:</strong> {user.email}</p>
-                        <p><strong>Phone:</strong> {user.phoneNo}</p>
+                        <h5><strong>Name:</strong> {user.username || "None"}</h5><br />
+                        <h5><strong>Email:</strong> {user.email || "None"}</h5><br />
+                        <h5><strong>Phone:</strong> {user.phoneNo || "None"}</h5><br />
                         <Button onClick={() => setShowProfileModal(true)} variant="primary">
                           Edit Profile
                         </Button>
@@ -230,7 +231,6 @@ export default function ProfilePage() {
         </Tab.Container>
       </Card>
 
-      {/* Profile Modal */}
       <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Edit Profile</Modal.Title>
@@ -269,7 +269,6 @@ export default function ProfilePage() {
         </Modal.Footer>
       </Modal>
 
-      {/* Address Modal */}
       <Modal show={showAddressModal} onHide={() => setShowAddressModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>{editingAddressId ? "Edit Address" : "Add Address"}</Modal.Title>
@@ -296,7 +295,6 @@ export default function ProfilePage() {
         </Modal.Footer>
       </Modal>
 
-      {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>

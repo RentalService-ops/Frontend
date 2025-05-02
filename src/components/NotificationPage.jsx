@@ -26,7 +26,9 @@ const NotificationPage = () => {
             },
           }
         );
+        if(!_.isEqual(response.data,notifications)){
         setNotifications(response.data);
+        }
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
       }
